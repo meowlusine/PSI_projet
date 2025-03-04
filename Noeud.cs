@@ -37,7 +37,7 @@ namespace PSI
         {
             get { return station; }
         }
-        public string Ligne
+        public int Ligne
         {
             get { return ligne; }
         }
@@ -57,7 +57,7 @@ namespace PSI
             get { return commune_nom; }
         }
 
-        public string Commune_code
+        public int Commune_code
         {
             get { return commune_code; }
         }
