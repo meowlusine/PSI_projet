@@ -9,7 +9,7 @@ namespace PSI
     public class Noeud
     {
         private int id;
-        private string station;
+        private string nom_station;
         private int ligne;
         private float longitude;
         private float latitude;
@@ -17,11 +17,11 @@ namespace PSI
         private int commune_code;
 
 
-        public Noeud(int id,string station,int ligne,float longitude,float latitude,string commune_nom, int commune_code)
+        public Noeud(int id,string nom_station,int ligne,float longitude,float latitude,string commune_nom, int commune_code)
         {
             this.id = id;
             this.commune_code = commune_code;
-            this.station = station;
+            this.nom_station = nom_station;
             this.longitude = longitude;
             this.latitude = latitude;
             this.commune_code= commune_code;
@@ -33,9 +33,9 @@ namespace PSI
             get { return id; }
         }
 
-        public string Station
+        public string Nom_station
         {
-            get { return station; }
+            get { return nom_station; }
         }
         public int Ligne
         {
@@ -64,7 +64,7 @@ namespace PSI
 
         public string toString()
         {
-            return($"id : {this.id}, La station {this.station} de la ligne {this.ligne} se situe a {this.commune_nom} ({this.commune_code}), aux coordonnées {this.longitude} {this.latitude}.");
+            return($"id : {this.id}, La station {this.nom_station} de la ligne {this.ligne} se situe a {this.commune_nom} ({this.commune_code}), aux coordonnées {this.longitude} {this.latitude}.");
         }
     }
 }

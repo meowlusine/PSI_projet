@@ -8,26 +8,46 @@ namespace PSI
 {
     public class Lien
     {
-        Noeud n_depart;
-        Noeud n_arrivee;
+        Noeud station;
+        Noeud precedent;
+        Noeud suivant;
+        int temps_entre_2_stations;
+        int temps_de_changement;
 
-        public Lien(Noeud n_depart, Noeud n_arrivee)
+
+        public Lien(Noeud station, Noeud precedent, Noeud suivant, int temps_entre_2_stations, int temps_de_changement)
         {
-            this.n_depart = n_depart;
-            this.n_arrivee = n_arrivee;
+            this.station = station;
+            this.precedent = precedent;
+            this.suivant = suivant;
+            this.temps_entre_2_stations = temps_entre_2_stations;
+            this.temps_de_changement = temps_de_changement;
 
         }
 
-        public Noeud N_depart 
+        public Noeud Station 
+        {
+            get { return station; } 
+        }
+
+        public Noeud Precedent 
         { 
-            get { return n_depart; } 
-            set { n_depart = value; }
+            get { return precedent; } 
         }
 
-        public Noeud N_arrivee 
+        public Noeud Suivant
         {
-            get { return n_arrivee; }
-            set { n_arrivee = value; }
+            get { return suivant; }
+        }
+
+        public int Temps_entre_2_stations
+        {
+            get { return temps_entre_2_stations; }
+        }
+
+        public int Temps_de_changement
+        {
+            get { return temps_de_changement; }
         }
 
     }
