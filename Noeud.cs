@@ -10,14 +10,14 @@ namespace PSI
     {
         private int id;
         private string station;
-        private string ligne;
+        private int ligne;
         private float longitude;
         private float latitude;
         private string commune_nom;
-        private string commune_code;
+        private int commune_code;
 
 
-        public Noeud(int id,string station,string ligne,float longitude,float latitude,string commune_nom, string commune_code)
+        public Noeud(int id,string station,int ligne,float longitude,float latitude,string commune_nom, int commune_code)
         {
             this.id = id;
             this.commune_code = commune_code;
