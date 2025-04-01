@@ -22,6 +22,10 @@ namespace PSI
         {
             get { return id; }
         }
+        public T Station
+        {
+            get { return station; }
+        }
 
        
         public string toString()
