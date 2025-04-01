@@ -47,7 +47,7 @@ namespace PSI
 
 
             Console.WriteLine("Première ligne (ID Station, Libelle Line, etc.):");
-            for (int i = 0; i < matrice_station.GetLength(1); i++)
+            for (int i = 1; i < matrice_station.GetLength(1); i++)
             {
                 Console.Write(matrice_station[0, i] + " | ");
             }
@@ -106,39 +106,65 @@ namespace PSI
             }
 
             //ajout lien 
+           
+
+
             List<Lien> liens = new List<Lien>();
-            for(int i=1; i < matrice_station.GetLength(0); i++)
+           
+
+            // Boucle sur la matrice en ignorant la ligne 0.
+            for (int i = 1; i < matrice_station.GetLength(0); i++)
             {
+                // Calcul de l'indice dans la liste de nœuds (décalage de 1)
+                int index = i - 1;
+
                 Noeud<Station> prec = new Noeud<Station>(0, null);
-                if (matrice_arc[i,2] !=null )
+                if (matrice_arc.GetLength(1) > 2 && !string.IsNullOrEmpty(matrice_arc[i, 2]) && index - 1 >= 0)
                 {
-                    prec = noeuds_temp[i - 1];
+                    prec = noeuds_temp[index - 1];
                 }
+
+               
                 Noeud<Station> suiv = new Noeud<Station>(0, null);
-                if (!string.IsNullOrEmpty(matrice_arc[i, 3]))
+                if (matrice_arc.GetLength(1) > 3 && !string.IsNullOrEmpty(matrice_arc[i, 3]) && (index + 1) < noeuds_temp.Count)
                 {
-                    suiv = noeuds_temp[i + 1];
+                    suiv = noeuds_temp[index + 1];
                 }
+
                 int temp_changement = 0;
-                if (!string.IsNullOrEmpty(matrice_arc[i, 5]))
+                if (matrice_arc.GetLength(1) > 5 && !string.IsNullOrEmpty(matrice_arc[i, 5]))
                 {
                     if (!int.TryParse(matrice_arc[i, 5], out temp_changement))
                     {
-                        temp_changement = 0; // ou une autre valeur par défaut
+                        temp_changement = 0;
                     }
                 }
 
-                liens.Add(new Lien (noeuds_temp[i], prec, suiv, int.Parse(matrice_arc[i, 4]),temp_changement ));
+                
+                int tempsEntre = 0;
+                if (matrice_arc.GetLength(1) > 4 && !string.IsNullOrEmpty(matrice_arc[i, 4]))
+                {
+                    if (!int.TryParse(matrice_arc[i, 4], out tempsEntre))
+                    {
+                        tempsEntre = 0;
+                    }
+                }
 
-
+               
+                liens.Add(new Lien(noeuds_temp[index], prec, suiv, tempsEntre, temp_changement));
             }
+
+
+
             // test lien 
 
             Console.WriteLine("\nListe des liens créés :");
             foreach (Lien lien in liens)
             {
-                Console.WriteLine(lien);
+                Console.WriteLine(lien.Temps_entre_2_stations);
             }
+            Console.WriteLine(liens.Count());
+            Console.WriteLine(noeuds_temp.Count());
 
             // Pause pour voir le résultat dans une application console classique
             Console.WriteLine("\nAppuyez sur une touche pour fermer...");
