@@ -1,50 +1,85 @@
-﻿using System;
-using System.IO;
+﻿namespace PSI;
 
-namespace PSI
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            string ligne;
-            StreamReader sr = new StreamReader("soc-karate.mtx");
-            do 
-            { 
-                ligne = sr.ReadLine(); 
-            } 
-            while (ligne.StartsWith("%"));
-
-            string[] dimensions = ligne.Split(' ');
-            int nbNoeuds = int.Parse(dimensions[0]);  // Le nombre de noeuds
-            int nbAretes = int.Parse(dimensions[2]); // Le nombre d'arêtes
-
-            Graphe graphe = new Graphe(nbNoeuds);
-            while ((ligne = sr.ReadLine()) != null)
+            string fichier_station = "MetroParis - Noeuds.csv"; 
+            string fichier_arc = "MetroParis - Arcs.csv"; 
+            string[,] matrice_station = Transformation_Matrice(fichier_station);
+            string[,] matrice_arc = Transformation_Matrice(fichier_arc);
+    
+            static string[,] Transformation_Matrice(string fichier)
             {
-                string[] valeurs = ligne.Split(' ');
-                int depart = int.Parse(valeurs[0]);  
-                int arrivee = int.Parse(valeurs[1]);
+                List<string[]> liste_temporaire = new List<string[]>();
+           
+                using (var reader = new StreamReader(fichier))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        string ligne = reader.ReadLine();
+                        string[] valeurs = ligne.Split(','); 
+                        liste_temporaire.Add(valeurs);
+                    }
+                }
+           
+                int nb_lignes = liste_temporaire.Count;
+                int nb_colonnes = liste_temporaire[0].Length;
+           
+                string[,] matrice = new string[nb_lignes, nb_colonnes];
+           
+                for (int i = 0; i < nb_lignes; i++)
+                {
+                    for (int j = 0; j < nb_colonnes; j++)
+                    {
+                        matrice[i, j] = liste_temporaire[i][j]; //liste pcq on ne connait pas la longueur de la matrice pour l'instant
+                    }
+                }
+                return matrice;
+            }
+                       
 
-                Noeud n_depart = graphe.noeuds[depart-1];
-                Noeud n_arrivee = graphe.noeuds[arrivee-1];
 
-                Lien lien = new Lien(n_depart, n_arrivee);
-                graphe.AjouterLien(lien);
+            Console.WriteLine("Première ligne (ID Station, Libelle Line, etc.):");
+            for (int i = 0; i < matrice_station.GetLength(1); i++)
+            {
+                Console.Write(matrice_station[0, i] + " | ");
+            }
+            Console.WriteLine();
+                       
+            Console.WriteLine("\nDétails pour la station 2:");
+            Console.WriteLine("ID Station: " + matrice_station[2, 0]);  // Devrait afficher "2"
+            Console.WriteLine("Libelle station: " + matrice_station[2, 2]);  // Devrait afficher "Argentine"
+            Console.WriteLine("Longitude: " + matrice_station[2, 3]);  // Devrait afficher "2.2894"
+            Console.WriteLine("Latitude: " + matrice_station[2, 4]);  // Devrait afficher "48.8756"  
+
+
+
+           
+            List<Station> stations = new List<Station>();
+
+            for (int i = 1; i < matrice_station.GetLength(0); i++) // i = 1 pour ignorer nom de colonnes
+            {
+                Console.WriteLine($"Traitement de la ligne {i}...");
+                string nom_station = matrice_station[i, 2];
+                int ligne = int.Parse(matrice_station[i, 1]);
+                string commune_nom = matrice_station[i, 5];
+                int commune_code = int.Parse(matrice_station[i, 6]);
+                float longitude = float.Parse(matrice_station[i, 3]);
+                float latitude = float.Parse(matrice_station[i, 4]);
+                
+
+                stations.Add(new Station(nom_station, ligne, commune_nom, commune_code, longitude, latitude));
+
             }
 
-            //graphe.Afficher_liste_adj();
-            //graphe.Affichier_matrice_adj();
-            //Console.WriteLine("DFS : ");
-            //graphe.DFS(graphe.noeuds[0]);
-            //graphe.BFS(graphe.noeuds[0]);
-            //Console.WriteLine(graphe.EstConnexe());
+            // Test pour afficher toutes les stations
+            foreach (var station in stations)
+            {
+                Console.WriteLine(station);
+            }
 
 
-            GraphVisualizer visualizer = new GraphVisualizer(graphe);
-            string fichierSortie = "graphe.png";
-            visualizer.GenererImage(fichierSortie);
-            visualizer.AfficherImage(fichierSortie);
-        }
+            
     }
 }
