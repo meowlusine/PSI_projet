@@ -10,9 +10,9 @@ namespace PSI
 {
     internal class GraphVisualizer
     {
-        private Graphe graphe;
+        private Graphe<Station> graphe;
 
-        public GraphVisualizer(Graphe graphe)
+        public GraphVisualizer(Graphe<Station> graphe)
         {
             this.graphe = graphe;
         }
@@ -53,7 +53,7 @@ namespace PSI
                 };
 
                 int nbNoeuds = graphe.noeuds.Count;
-                Dictionary<Noeud, SKPoint> positions = new Dictionary<Noeud, SKPoint>();
+                Dictionary<Noeud<Station>, SKPoint> positions = new Dictionary<Noeud<Station>, SKPoint>();
 
                 // Calculer les positions des nœuds en cercle
                 for (int i = 0; i < nbNoeuds; i++)
