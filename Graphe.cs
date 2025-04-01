@@ -14,18 +14,19 @@ namespace PSI
         public int[,] matrice_adjacence;
         public List<Noeud<T>> noeuds { get; private set; }
 
-        public Graphe(int nb_noeuds)
+        public Graphe(List<Noeud<T>> noeuds)
         {
-            this.noeuds = new List<Noeud<T>>();
+            this.noeuds = noeuds;  
             this.liste_adjacence = new Dictionary<Noeud<T>, List<Noeud<T>>>();
-            for(int i = 1; i < nb_noeuds+1; i++)
-            {
-                Noeud<T> noeud = new Noeud<T>(i,new T());
-                noeuds.Add(noeud);
-                liste_adjacence[noeud]=new List<Noeud<T>>();
-            }
-            this.matrice_adjacence = new int[nb_noeuds,nb_noeuds];
 
+            // Initialisation de la liste d'adjacence pour chaque noeud
+            foreach (var noeud in noeuds)
+            {
+                liste_adjacence[noeud] = new List<Noeud<T>>();  // La clé est le Noeud<T>
+            }
+
+            this.matrice_adjacence = new int[noeuds.Count, noeuds.Count];  // Création de la matrice d'adjacence
+        
         }
 
         /// <summary>
@@ -34,21 +35,30 @@ namespace PSI
         /// <param name="lien"></param>
         public void AjouterLien(Lien lien)
         {
-            this.liste_adjacence[noeuds[lien.Station.Id-1]].Add(noeuds[lien.Suivant.Id-1]);
-            this.liste_adjacence[noeuds[lien.Suivant.Id-1]].Add(noeuds[lien.Station.Id-1]);
-            this.matrice_adjacence[lien.Station.Id-1, lien.Suivant.Id-1] = 1;
-            this.matrice_adjacence[lien.Suivant.Id-1, lien.Station.Id-1] = 1;
+            Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
+            Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
 
+            if (lien.Station.Id - 1 >= 0 && lien.Station.Id - 1 < noeuds.Count)
+            {
+                this.liste_adjacence[noeuds[lien.Station.Id - 1]].Add(noeuds[lien.Suivant.Id - 1]);
+                this.liste_adjacence[noeuds[lien.Suivant.Id - 1]].Add(noeuds[lien.Station.Id - 1]);
+                this.matrice_adjacence[lien.Station.Id - 1, lien.Suivant.Id - 1] = 1;
+                this.matrice_adjacence[lien.Suivant.Id - 1, lien.Station.Id - 1] = 1;
+            }
+            else
+            {
+                Console.WriteLine($"Index hors limites pour les stations {lien.Station.Id} et {lien.Suivant.Id}");
+            }
         }
 
         public void Afficher_liste_adj()
         {
             foreach(Noeud<T> noeud in this.liste_adjacence.Keys)
             {
-                Console.WriteLine(noeud.toString() + "\nLien avec  : ");
+                Console.WriteLine(noeud.ToString() + "\nLien avec  : ");
                 foreach(Noeud<T> lie in liste_adjacence[noeud])
                 {
-                    Console.Write(lie.toString() + ", ");
+                    Console.Write(lie.ToString() + ", ");
                 }
                 Console.WriteLine("\n");
             }
@@ -102,7 +112,7 @@ namespace PSI
             Console.WriteLine("Ordre des noeuds visités : ");
             foreach (Noeud<T> noeud in ordreVisites)
             {
-                Console.Write(noeud.toString() + " ");
+                Console.Write(noeud.ToString() + " ");
             }
             Console.WriteLine();
 
@@ -141,7 +151,7 @@ namespace PSI
             Console.WriteLine("Ordre des noeuds visités : ");
             foreach (Noeud<T> noeud in ordreVisites)
             {
-                Console.Write(noeud.toString() + " ");
+                Console.Write(noeud.ToString() + " ");
             }
             Console.WriteLine();
             return visite;
@@ -149,20 +159,9 @@ namespace PSI
 
         public bool EstConnexe()
         {
-            bool est_connexe = true;
-            for(int i = 0;i<this.noeuds.Count;i++)
-            {
-                bool[] visite = this.DFS(this.noeuds[i]);
-                foreach(bool val in  visite)
-                {
-                    if (val == false)
-                    {
-                        est_connexe = false;
-                    }
-                }
-            }
-            return est_connexe;
-
+            bool[] visite = this.DFS(this.noeuds[0]); // On commence le DFS depuis le premier nœud
+            return visite.All(v => v); // Vérifie si tous les nœuds ont été visités
         }
+
     }
 }
