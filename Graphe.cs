@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 
 namespace PSI
 {
-    public class Graphe
+    public class Graphe<T> where T : Station ,new()
     {
 
-        public Dictionary<Noeud, List<Noeud>> liste_adjacence;
+        public Dictionary<Noeud<T>, List<Noeud<T>>> liste_adjacence;
         public int[,] matrice_adjacence;
-        public List<Noeud> noeuds { get; private set; }
+        public List<Noeud<T>> noeuds { get; private set; }
 
         public Graphe(int nb_noeuds)
         {
-            this.noeuds = new List<Noeud>();
-            this.liste_adjacence = new Dictionary<Noeud, List<Noeud>>();
+            this.noeuds = new List<Noeud<T>>();
+            this.liste_adjacence = new Dictionary<Noeud<T>, List<Noeud<T>>>();
             for(int i = 1; i < nb_noeuds+1; i++)
             {
-                Noeud noeud = new Noeud(i);
+                Noeud<T> noeud = new Noeud<T>(i,new T());
                 noeuds.Add(noeud);
-                liste_adjacence[noeud]=new List<Noeud>();
+                liste_adjacence[noeud]=new List<Noeud<T>>();
             }
             this.matrice_adjacence = new int[nb_noeuds,nb_noeuds];
 
@@ -34,19 +34,19 @@ namespace PSI
         /// <param name="lien"></param>
         public void AjouterLien(Lien lien)
         {
-            this.liste_adjacence[noeuds[lien.N_depart.Id-1]].Add(noeuds[lien.N_arrivee.Id-1]);
-            this.liste_adjacence[noeuds[lien.N_arrivee.Id-1]].Add(noeuds[lien.N_depart.Id-1]);
-            this.matrice_adjacence[lien.N_depart.Id-1, lien.N_arrivee.Id-1] = 1;
-            this.matrice_adjacence[lien.N_arrivee.Id-1, lien.N_depart.Id-1] = 1;
+            this.liste_adjacence[noeuds[lien.Station.Id-1]].Add(noeuds[lien.Suivant.Id-1]);
+            this.liste_adjacence[noeuds[lien.Suivant.Id-1]].Add(noeuds[lien.Station.Id-1]);
+            this.matrice_adjacence[lien.Station.Id-1, lien.Suivant.Id-1] = 1;
+            this.matrice_adjacence[lien.Suivant.Id-1, lien.Station.Id-1] = 1;
 
         }
 
         public void Afficher_liste_adj()
         {
-            foreach(Noeud noeud in this.liste_adjacence.Keys)
+            foreach(Noeud<T> noeud in this.liste_adjacence.Keys)
             {
                 Console.WriteLine(noeud.toString() + "\nLien avec  : ");
-                foreach(Noeud lie in liste_adjacence[noeud])
+                foreach(Noeud<T> lie in liste_adjacence[noeud])
                 {
                     Console.Write(lie.toString() + ", ");
                 }
@@ -71,23 +71,23 @@ namespace PSI
         /// parcours en profondeurs du graphe utilisant la liste d'adjacence
         /// </summary>
         /// <param name="depart"></param>
-        public bool[] DFS(Noeud depart)
+        public bool[] DFS(Noeud<T> depart)
         {
-            Stack<Noeud> pile = new Stack<Noeud>();
+            Stack<Noeud<T>> pile = new Stack<Noeud<T>>();
             bool[] visite = new bool[noeuds.Count];
-            List<Noeud> ordreVisites = new List<Noeud>();
+            List<Noeud<T>> ordreVisites = new List<Noeud<T>>();
 
             pile.Push(depart);
 
             while(pile.Count > 0)
             {
-                Noeud actuel = pile.Pop();
+                Noeud<T> actuel = pile.Pop();
                 int index = actuel.Id - 1;
                 if(visite[index] == false)
                 {
                     visite[index]  = true;
                     ordreVisites.Add(actuel);
-                    foreach(Noeud voisin in this.liste_adjacence[actuel])
+                    foreach(Noeud<T> voisin in this.liste_adjacence[actuel])
                     {
                         int voisinIndex = voisin.Id - 1;
                         if (visite[voisinIndex]== false)
@@ -100,7 +100,7 @@ namespace PSI
 
             // Affichage de l'ordre des nœuds visités
             Console.WriteLine("Ordre des noeuds visités : ");
-            foreach (Noeud noeud in ordreVisites)
+            foreach (Noeud<T> noeud in ordreVisites)
             {
                 Console.Write(noeud.toString() + " ");
             }
@@ -114,21 +114,21 @@ namespace PSI
         /// parcours en largeurs du graphe en utilisant la liste d'adjacence
         /// </summary>
         /// <param name="depart"></param>
-        public bool[] BFS(Noeud depart)
+        public bool[] BFS(Noeud<T> depart)
         {
             bool[] visite = new bool[noeuds.Count];
-            Queue<Noeud> file = new Queue<Noeud>();
-            List<Noeud> ordreVisites = new List<Noeud>();
+            Queue<Noeud<T>> file = new Queue<Noeud<T>>();
+            List<Noeud<T>> ordreVisites = new List<Noeud<T>>();
 
             file.Enqueue(depart);
             visite[depart.Id-1] = true;
 
             while(file.Count > 0)
             {
-                Noeud actuel = file.Dequeue();
+                Noeud<T> actuel = file.Dequeue();
                 ordreVisites.Add(actuel) ;
 
-                foreach(Noeud voisin in liste_adjacence[actuel] )
+                foreach(Noeud<T> voisin in liste_adjacence[actuel] )
                 {
                     if (visite[voisin.Id -1]== false)
                     {
@@ -139,7 +139,7 @@ namespace PSI
             }
 
             Console.WriteLine("Ordre des noeuds visités : ");
-            foreach (Noeud noeud in ordreVisites)
+            foreach (Noeud<T> noeud in ordreVisites)
             {
                 Console.Write(noeud.toString() + " ");
             }
