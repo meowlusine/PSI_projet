@@ -54,15 +54,14 @@ class Program
             Console.WriteLine("Latitude: " + matrice_station[2, 4]);  // Devrait afficher "48.8756"  
 
 
-
            
             List<Station> stations = new List<Station>();
 
             for (int i = 1; i < matrice_station.GetLength(0); i++) // i = 1 pour ignorer nom de colonnes
             {
-                Console.WriteLine($"Traitement de la ligne {i}...");
+            
                 string nom_station = matrice_station[i, 2];
-                int ligne = int.Parse(matrice_station[i, 1]);
+                string ligne = matrice_station[i, 1];
                 string commune_nom = matrice_station[i, 5];
                 int commune_code = int.Parse(matrice_station[i, 6]);
                 float longitude = float.Parse(matrice_station[i, 3]);
@@ -73,12 +72,28 @@ class Program
 
             }
 
-            // Test pour afficher toutes les stations
-            foreach (var station in stations)
+            List<Noeud<Station>> noeuds = new List<Noeud<Station>>();
+            for(int i=0; i<stations.Count; i++)
             {
-                Console.WriteLine(station);
+                noeuds.Add(new Noeud<Station>(i+1, stations[i]));
             }
 
+            //TEST STATIONS
+            //foreach (var station in stations)
+            //{
+                //Console.WriteLine($"Station : {station.Nom_station}, Ligne : {station.Ligne}, " +
+                                  //$"Commune : {station.Commune_nom} ({station.Commune_code}), " +
+                                  //$"Coordonnées : {station.Longitude}, {station.Latitude}");
+            //}
+
+
+            //TEST NOEUDS
+            //Console.WriteLine("Liste des Noeuds :");
+            //foreach (var noeud in noeuds)
+            //{
+                // Affiche chaque noeud avec son contenu (via ToString)
+                //Console.WriteLine(noeud.ToString());
+            //}
 
             
     }
