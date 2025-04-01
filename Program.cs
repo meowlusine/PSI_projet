@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using OfficeOpenXml;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace PSI
 {
@@ -77,11 +78,72 @@ namespace PSI
 
             }
 
+            // ajout de noeud
+
+            List<Noeud<Station>> noeuds_temp = new List<Noeud<Station>>();
+            for (int i = 0; i < stations.Count; i++)
+            { 
+                    noeuds_temp.Add(new Noeud<Station>(i + 1, stations[i]));
+                
+            }
             List<Noeud<Station>> noeuds = new List<Noeud<Station>>();
+            List<string> nom_noeuds = new List<string>();
+           
             for (int i = 0; i < stations.Count; i++)
             {
-                noeuds.Add(new Noeud<Station>(i + 1, stations[i]));
+                if (!nom_noeuds.Contains(noeuds_temp[i].Station.Nom_station))
+                {
+                    nom_noeuds.Add(noeuds_temp[i].Station.Nom_station);
+                    noeuds.Add(new Noeud<Station>(int.Parse(matrice_station[i+1,0]), stations[i]));
+                }
+               
             }
+            // test noeud
+            
+            foreach (var noeud in noeuds)
+            {
+                Console.WriteLine("Noeud Id: " + noeud.Id + ", Station: " + noeud.Station.Nom_station);
+            }
+
+            //ajout lien 
+            List<Lien> liens = new List<Lien>();
+            for(int i=1; i < matrice_station.GetLength(0); i++)
+            {
+                Noeud<Station> prec = new Noeud<Station>(0, null);
+                if (matrice_arc[i,2] !=null )
+                {
+                    prec = noeuds_temp[i - 1];
+                }
+                Noeud<Station> suiv = new Noeud<Station>(0, null);
+                if (!string.IsNullOrEmpty(matrice_arc[i, 3]))
+                {
+                    suiv = noeuds_temp[i + 1];
+                }
+                int temp_changement = 0;
+                if (!string.IsNullOrEmpty(matrice_arc[i, 5]))
+                {
+                    if (!int.TryParse(matrice_arc[i, 5], out temp_changement))
+                    {
+                        temp_changement = 0; // ou une autre valeur par défaut
+                    }
+                }
+
+                liens.Add(new Lien (noeuds_temp[i], prec, suiv, int.Parse(matrice_arc[i, 4]),temp_changement ));
+
+
+            }
+            // test lien 
+
+            Console.WriteLine("\nListe des liens créés :");
+            foreach (Lien lien in liens)
+            {
+                Console.WriteLine(lien);
+            }
+
+            // Pause pour voir le résultat dans une application console classique
+            Console.WriteLine("\nAppuyez sur une touche pour fermer...");
+            Console.ReadKey();
+
 
             //TEST STATIONS
             //foreach (var station in stations)
