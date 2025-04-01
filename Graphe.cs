@@ -38,16 +38,16 @@ namespace PSI
             Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
             Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
 
-            if (lien.Station.Id - 1 >= 0 && lien.Station.Id - 1 < noeuds.Count)
+            int stationIndex = lien.Station.Id - 1;
+            int suivantIndex = lien.Suivant.Id - 1;
+
+            if (stationIndex >= 0 && stationIndex < noeuds.Count && suivantIndex >= 0 && suivantIndex < noeuds.Count)
             {
-                this.liste_adjacence[noeuds[lien.Station.Id - 1]].Add(noeuds[lien.Suivant.Id - 1]);
-                this.liste_adjacence[noeuds[lien.Suivant.Id - 1]].Add(noeuds[lien.Station.Id - 1]);
-                this.matrice_adjacence[lien.Station.Id - 1, lien.Suivant.Id - 1] = 1;
-                this.matrice_adjacence[lien.Suivant.Id - 1, lien.Station.Id - 1] = 1;
+                this.liste_adjacence[noeuds[stationIndex]].Add(noeuds[suivantIndex]);
             }
             else
             {
-                Console.WriteLine($"Index hors limites pour les stations {lien.Station.Id} et {lien.Suivant.Id}");
+                Console.WriteLine($"Index hors limites : Station {lien.Station.Id} ou Suivant {lien.Suivant.Id}");
             }
         }
 
