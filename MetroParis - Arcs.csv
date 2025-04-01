@@ -1,0 +1,333 @@
+Station Id,Station,Précédent,Suivant,Temps entre 2 stations,Temps de Changement
+1,Porte Maillot,,2,0,
+2,Argentine,1,3,3,
+3,Charles de Gaulle - Etoile,2,4,2,3
+4,George V,3,5,3,
+5,Franklin D. Roosevelt,4,6,2,5
+6,Champs-Elysées - Clemenceau,5,7,3,3
+7,Concorde,6,8,2,
+8,Tuileries,7,9,4,
+9,Palais Royal - Musée du Louvre,8,10,2,7
+10,Louvre - Rivoli,9,11,3,
+11,Châtelet,10,12,2,8
+12,Hôtel de Ville,11,13,3,2
+13,Saint-Paul (Le Marais),12,14,2,
+14,Bastille,13,15,4,5
+15,Gare de Lyon,14,16,2,5
+16,Reuilly - Diderot,15,17,2,4
+17,Nation,16,18,2,7
+18,Porte de Vincennes,17,19,2,
+19,Château de Vincennes,18,,1,
+20,Porte Dauphine,,21,0,
+21,Victor Hugo,20,22,2,
+22,Charles de Gaulle - Etoile,21,23,1,3
+23,Ternes,22,24,2,
+24,Courcelles,23,25,1,
+25,Monceau,24,26,2,
+26,Villiers,25,27,1,3
+27,Rome,26,28,3,
+28,Place de Clichy,27,29,2,2
+29,Blanche,28,30,1,
+30,Pigalle,29,31,2,3
+31,Anvers,30,32,3,
+32,Barbès - Rochechouart,31,33,2,3
+33,La Chapelle,32,34,5,
+34,Stalingrad,33,35,2,4
+35,Jaurès,34,36,2,3
+36,Colonel Fabien,35,37,2,
+37,Belleville,36,38,2,4
+38,Couronnes,37,39,2,
+39,Ménilmontant,38,40,1,
+40,Père Lachaise,39,41,1,4
+41,Philippe Auguste,40,42,1,
+42,Alexandre Dumas,41,43,2,
+43,Avron,42,44,1,
+44,Nation,43,,2,7
+45,Porte de Champerret,,46,0,
+46,Pereire,45,47,2,
+47,Wagram,46,48,4,
+48,Malesherbes,47,49,3,
+49,Villiers,48,50,3,3
+50,Europe,49,51,2,
+51,Saint-Lazare,50,52,2,7
+52,Havre-Caumartin,51,53,3,
+53,Opéra,52,54,4,6
+54,Quatre Septembre,53,55,2,
+55,Bourse,54,56,3,
+56,Sentier,55,57,3,
+57,Réaumur - Sébastopol,56,58,3,5
+58,Arts et Métiers,57,59,2,4
+59,Temple,58,60,2,
+60,République,59,61,4,6
+61,Parmentier,60,62,2,
+62,Rue Saint-Maur,61,63,2,
+63,Père Lachaise,62,64,4,4
+64,Gambetta,63,65,2,4
+65,Porte de Bagnolet,64,,2,
+66,Porte des Lilas,,67,0,4
+67,Saint-Fargeau,66,68,3,
+68,Pelleport,67,69,3,
+69,Gambetta,68,,2,4
+70,Porte de Clignancourt,,71,0,
+71,Simplon,70,72,1,
+72,Marcadet - Poissonniers,71,73,2,2
+73,Château Rouge,72,74,2,
+74,Barbès - Rochechouart,73,75,4,3
+75,Gare du Nord,74,76,3,5
+76,Gare de l'Est,75,77,3,3
+77,Château d'Eau,76,78,3,
+78,Strasbourg - Saint-Denis,77,79,2,5
+79,Réaumur - Sébastopol,78,80,2,5
+80,Etienne Marcel,79,81,4,
+81,Les Halles,80,82,4,
+82,Châtelet,81,83,1,8
+83,Cité,82,84,2,
+84,Saint-Michel,83,85,2,4
+85,Odéon,84,86,3,2
+86,Saint-Germain-des-Prés,85,87,3,
+87,Saint-Sulpice,86,88,3,
+88,Saint-Placide,87,89,2,
+89,Montparnasse Bienvenue,88,90,2,6
+90,Vavin,89,91,4,
+91,Raspail,90,92,4,3
+92,Denfert-Rochereau,91,93,3,5
+93,Mouton-Duvernet,92,94,2,
+94,Alésia,93,95,2,
+95,Porte d'Orléans,94,,3,
+96,Porte de Pantin,,97,0,
+97,Ourcq,96,98,1,
+98,Laumière,97,99,2,
+99,Jaurès,98,100,3,3
+100,Stalingrad,99,101,3,4
+101,Gare du Nord,100,102,3,5
+102,Gare de l'Est,101,103,2,3
+103,Jacques Bonsergent,102,104,2,
+104,République,103,105,2,6
+105,Oberkampf,104,106,2,3
+106,Richard-Lenoir,105,107,4,
+107,Bréguet-Sabin,106,108,2,
+108,Bastille,107,109,2,5
+109,Quai de la Rapée,108,110,3,
+110,Gare d'Austerlitz,109,111,3,2
+111,Saint-Marcel,110,112,1,4
+112,Campo-Formio,111,113,2,
+113,Place d'Italie,112,,4,4
+114,Charles de Gaulle - Etoile,,115,0,3
+115,Kléber,114,116,2,
+116,Boissière,115,117,3,
+117,Trocadéro,116,118,2,4
+118,Passy,117,119,2,
+119,Bir-Hakeim,118,120,4,
+120,Dupleix,119,121,3,
+121,La Motte-Picquet - Grenelle,120,122,3,3
+122,Cambronne,121,123,3,
+123,Sèvres-Lecourbe,122,124,1,3
+124,Pasteur,123,125,2,3
+125,Montparnasse Bienvenue,124,126,2,6
+126,Edgar Quinet,125,127,2,
+127,Raspail,126,128,2,3
+128,Denfert-Rochereau,127,129,4,5
+129,Saint-Jacques,128,130,4,
+130,Glacière,129,131,2,
+131,Corvisart,130,132,4,
+132,Place d'Italie,131,133,3,4
+133,Nationale,132,134,3,
+134,Chevaleret,133,135,1,
+135,Quai de la Gare,134,136,2,
+136,Bercy,135,137,2,6
+137,Dugommier,136,138,2,
+138,Daumesnil,137,139,3,3
+139,Bel-Air,138,140,3,
+140,Picpus,139,141,4,
+141,Nation,140,,2,7
+142,Porte de la Villette,,143,0,
+143,Corentin Cariou,142,144,4,
+144,Crimée,143,145,3,
+145,Riquet,144,146,2,
+146,Stalingrad,145,147,3,4
+147,Louis Blanc,146,148,3,4
+148,Château Landon,147,149,2,
+149,Gare de l'Est,148,150,2,3
+150,Poissonnière,149,151,2,
+151,Cadet,150,152,3,
+152,Le Peletier,151,153,2,
+153,Chaussée d'Antin - La Fayette,152,154,2,6
+154,Opéra,153,155,4,6
+155,Pyramides,154,156,2,4
+156,Palais Royal - Musée du Louvre,155,157,2,7
+157,Pont Neuf,156,158,3,
+158,Châtelet,157,159,3,8
+159,Pont Marie (Cité des Arts),158,160,3,
+160,Sully - Morland,159,161,4,
+161,Jussieu,160,162,4,
+162,Place Monge,161,163,3,
+163,Censier - Daubenton,162,164,2,
+164,Les Gobelins,163,165,2,
+165,Place d'Italie,164,166,1,4
+166,Tolbiac,165,167,3,
+167,Maison Blanche,166,168,3,2
+168,Porte d'Italie,167,169,2,
+169,Porte de Choisy,168,170,4,
+170,Porte d'Ivry,169,,2,
+171,Maison Blanche,166,,3,2
+172,Louis Blanc,,173,0,4
+173,Jaurès,172,174,2,3
+174,Bolivar,173,175,3,
+175,Buttes Chaumont,174,176,3,
+176,Botzaris,175,177,2,2
+177,Place des Fêtes,176,178,2,3
+178,Pré-Saint-Gervais,177,179,3,
+179,Danube,178,180,2,
+180,Botzaris,179,,2,2
+181,Balard,,182,0,
+182,Lourmel,181,183,3,
+183,Boucicaut,182,184,4,
+184,Félix Faure,183,185,2,
+185,Commerce,184,186,2,
+186,La Motte-Picquet - Grenelle,185,187,3,3
+187,Ecole Militaire,186,188,3,
+188,La Tour-Maubourg,187,189,3,
+189,Invalides,188,190,3,4
+190,Concorde,189,191,1,3
+191,Madeleine,190,192,2,3
+192,Opéra,191,193,2,6
+193,Richelieu - Drouot,192,194,2,2
+194,Grands Boulevards,193,195,3,4
+195,Bonne Nouvelle,194,196,2,3
+196,Strasbourg - Saint-Denis,195,197,2,5
+197,République,196,198,4,6
+198,Filles du Calvaire,197,199,3,
+199,Saint-Sébastien - Froissart,198,200,3,
+200,Chemin Vert,199,201,3,
+201,Bastille,200,202,1,5
+202,Ledru-Rollin,201,203,2,
+203,Faidherbe - Chaligny,202,204,2,
+204,Reuilly - Diderot,203,205,2,4
+205,Montgallet,204,206,3,
+206,Daumesnil,205,207,3,3
+207,Michel Bizot,206,208,4,
+208,Porte Dorée,207,209,4,
+209,Porte de Charenton,208,,3,
+210,Porte de Saint-Cloud,,211,0,
+211,Exelmans,210,212,3, 
+212,Michel-Ange - Molitor,211,213,2,5
+213,Michel-Ange - Auteuil,212,214,2,5
+214,Jasmin,213,215,3,
+215,Ranelagh,214,216,4,
+216,La Muette,215,217,4,
+217,Rue de la Pompe,216,218,2,
+218,Trocadéro,217,219,3,4
+219,Iéna,218,220,3,3
+220,Alma - Marceau,219,221,1,
+221,Franklin D. Roosevelt,220,222,2,5
+222,Saint-Philippe du Roule,221,223,2,
+223,Miromesnil,222,224,3,4
+224,Saint-Augustin,223,225,4,
+225,Havre-Caumartin,224,226,2,2
+226,Chaussée d'Antin - La Fayette,225,227,3,6
+227,Richelieu - Drouot,226,228,2,2
+228,Grands Boulevards,227,229,2,4
+229,Bonne Nouvelle,228,230,2,3
+230,Strasbourg - Saint-Denis,229,231,3,5
+231,République,230,232,3,6
+232,Oberkampf,231,233,3,3
+233,Saint-Ambroise,232,234,4,
+234,Voltaire,233,235,4,
+235,Charonne,234,236,3,
+236,Rue des Boulets,235,237,1,
+237,Nation,236,238,2,7
+238,Buzenval,237,239,2,
+239,Maraîchers,238,240,2,
+240,Porte de Montreuil,239,,3,
+241,Gare d'Austerlitz,,242,0,2
+242,Jussieu,241,243,2,
+243,Cardinal Lemoine,242,244,2,
+244,Maubert - Mutualité,243,245,3,
+245,Cluny - La Sorbonne,244,246,3,
+246,Odéon,245,247,2,2
+247,Mabillon,246,248,2,
+248,Sèvres - Babylone,247,249,4,3
+249,Vaneau,248,250,2,
+250,Duroc,249,251,2,4
+251,Ségur,250,252,1,
+252,La Motte-Picquet - Grenelle,251,253,2,3
+253,Avenue Emile Zola,252,254,2,
+254,Charles Michels,253,255,3,
+255,Javel - André Citroën,254,256,3,
+256,Eglise d'Auteuil,255,257,4,
+257,Michel-Ange - Auteuil,256,258,2,5
+258,Porte d'Auteuil,257,259,2,
+259,Michel-Ange - Molitor,258,260,3,5
+260,Chardon Lagache,259,261,2,
+261,Mirabeau,260,,2,
+262,Châtelet,,263,0,8
+263,Hôtel de Ville,262,264,2,3
+264,Rambuteau,263,265,2,
+265,Arts et Métiers,264,266,3,4
+266,République,265,267,4,6
+267,Goncourt,266,268,1,
+268,Belleville,267,269,2,4
+269,Pyrénées,268,270,2,
+270,Jourdain,269,271,3,
+271,Place des FÃªtes,270,272,3,3
+272,Télégraphe,271,273,4,
+273,Porte des Lilas,272,,2,4
+274,Porte de la Chapelle,,275,0,
+275,Marx Dormoy,274,276,2,
+276,Marcadet - Poissonniers,275,277,2,2
+277,Jules Joffrin,276,278,2,
+278,Lamarck - Caulaincourt,277,279,3,
+279,Abbesses,278,280,3,
+280,Pigalle,279,281,3,3
+281,Saint-Georges,280,282,4,
+282,Notre-Dame-de-Lorette,281,283,3,
+283,Trinité - d'Estienne d'Orves,282,284,2,
+284,Saint-Lazare,283,285,1,7
+285,Madeleine,284,286,2,3
+286,Concorde,285,287,2,3
+287,Assemblée Nationale,286,288,4,
+288,Solférino,287,289,4,
+289,Rue du Bac,288,290,3,
+290,Sèvres - Babylone,289,291,1,3
+291,Rennes,290,292,2,
+292,Notre-Dame des Champs,291,293,1,
+293,Montparnasse Bienvenue,292,294,2,6
+294,Falguière,293,295,2,
+295,Pasteur,294,296,3,3
+296,Volontaires,295,297,2,
+297,Vaugirard,296,298,2,
+298,Convention,297,299,2,
+299,Porte de Versailles,298,,3,
+300,Porte de Vanves,,301,0,
+301,Plaisance,300,302,2,
+302,Pernety,301,303,3,
+303,Gaîté,302,304,4,
+304,Montparnasse Bienvenue,303,305,1,6
+305,Duroc,304,306,2,4
+306,Saint-François-Xavier,305,307,2,
+307,Varenne,306,308,3,
+308,Invalides,307,309,3,4
+309,Champs-Elysées - Clemenceau,308,310,3,3
+310,Miromesnil,309,311,2,4
+311,Saint-Lazare,310,312,4,7
+312,Liège,311,313,2,
+313,Place de Clichy,312,314,3,2
+314,La Fourche,313,315,1,4
+315,Guy Môquet,314,316,2,
+316,Porte de Saint-Ouen,315,317,2,
+317,La Fourche,316,318,3,4
+318,Brochant,317,319,2,
+319,Porte de Clichy,318,,3,3
+320,Porte de Clichy,,321,0,3
+321,Pont Cardinet,320,322,2,
+322,Saint-Lazare,321,323,2,7
+323,Madeleine,322,324,4,3
+324,Pyramides,323,325,2,4
+325,Châtelet,324,326,3,8
+326,Gare de Lyon,325,327,3,5
+327,Bercy,326,328,3,6
+328,Cour Saint-Emilion,327,329,4,
+329,Bibliothèque François Mitterrand,328,330,2,
+330,Olympiades,329,331,3,4
+331,Olympiades,330,332,1,4
+332,Maison Blanche,331,,2,2
