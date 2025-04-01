@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using OfficeOpenXml;
-using static OfficeOpenXml.ExcelErrorValue;
+
 
 namespace PSI
 {
@@ -46,18 +45,18 @@ namespace PSI
 
 
 
-            Console.WriteLine("Première ligne (ID Station, Libelle Line, etc.):");
-            for (int i = 1; i < matrice_station.GetLength(1); i++)
-            {
-                Console.Write(matrice_station[0, i] + " | ");
-            }
-            Console.WriteLine();
+            //Console.WriteLine("Première ligne (ID Station, Libelle Line, etc.):");
+            //for (int i = 1; i < matrice_station.GetLength(1); i++)
+            //{
+                //Console.Write(matrice_station[0, i] + " | ");
+            //}
+            //Console.WriteLine();
 
-            Console.WriteLine("\nDétails pour la station 2:");
-            Console.WriteLine("ID Station: " + matrice_station[2, 0]);  // Devrait afficher "2"
-            Console.WriteLine("Libelle station: " + matrice_station[2, 2]);  // Devrait afficher "Argentine"
-            Console.WriteLine("Longitude: " + matrice_station[2, 3]);  // Devrait afficher "2.2894"
-            Console.WriteLine("Latitude: " + matrice_station[2, 4]);  // Devrait afficher "48.8756"  
+            //Console.WriteLine("\nDétails pour la station 2:");
+            //Console.WriteLine("ID Station: " + matrice_station[2, 0]);  // Devrait afficher "2"
+            //Console.WriteLine("Libelle station: " + matrice_station[2, 2]);  // Devrait afficher "Argentine"
+            //Console.WriteLine("Longitude: " + matrice_station[2, 3]);  // Devrait afficher "2.2894"
+            //Console.WriteLine("Latitude: " + matrice_station[2, 4]);  // Devrait afficher "48.8756"  
 
 
 
@@ -98,17 +97,11 @@ namespace PSI
                 }
                
             }
-            // test noeud
-            
-            foreach (var noeud in noeuds)
-            {
-                Console.WriteLine("Noeud Id: " + noeud.Id + ", Station: " + noeud.Station.Nom_station);
-            }
+
+
+
 
             //ajout lien 
-           
-
-
             List<Lien> liens = new List<Lien>();
            
 
@@ -156,19 +149,57 @@ namespace PSI
 
 
 
-            // test lien 
 
-            Console.WriteLine("\nListe des liens créés :");
-            foreach (Lien lien in liens)
+
+            //Creation graphe 
+            Graphe<Station> graphe = new Graphe<Station>(noeuds);
+
+            // Ajoute les liens dans le graphe
+            foreach (var lien in liens)
             {
-                Console.WriteLine(lien.Temps_entre_2_stations);
+                graphe.AjouterLien(lien);
             }
-            Console.WriteLine(liens.Count());
-            Console.WriteLine(noeuds_temp.Count());
+
+            // Affiche la liste d'adjacence
+            graphe.Afficher_liste_adj();
+
+            // Affichage de la matrice d'adjacence
+            //Console.WriteLine("Matrice d'adjacence :");
+            //graphe.Affichier_matrice_adj();
+
+
+            // Test DFS
+            Console.WriteLine("\nTest DFS depuis Station 1 :");
+            graphe.DFS(noeuds[0]);
+
+            // Test BFS
+            Console.WriteLine("\nTest BFS depuis Station 1 :");
+            graphe.BFS(noeuds[0]);
+
+            // Vérification si le graphe est connexe
+            Console.WriteLine("\nLe graphe est-il connexe ? " + graphe.EstConnexe());
+
 
             // Pause pour voir le résultat dans une application console classique
             Console.WriteLine("\nAppuyez sur une touche pour fermer...");
             Console.ReadKey();
+            
+
+
+
+
+
+        
+
+
+             // test lien 
+            //Console.WriteLine("\nListe des liens créés :");
+            //foreach (Lien lien in liens)
+            //{
+                //Console.WriteLine(lien.Temps_entre_2_stations);
+            //}
+            //Console.WriteLine(liens.Count());
+            //Console.WriteLine(noeuds_temp.Count());
 
 
             //TEST STATIONS
@@ -184,8 +215,8 @@ namespace PSI
             //Console.WriteLine("Liste des Noeuds :");
             //foreach (var noeud in noeuds)
             //{
-            // Affiche chaque noeud avec son contenu (via ToString)
-            //Console.WriteLine(noeud.ToString());
+                //Affiche chaque noeud avec son contenu (via ToString)
+                //Console.WriteLine(noeud.ToString());
             //}
 
 
