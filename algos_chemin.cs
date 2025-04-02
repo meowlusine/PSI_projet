@@ -9,23 +9,23 @@ namespace PSI
     internal class algos_chemin
     {
        
-        public static Noeud[] dijkstra(Graphe graphe, Noeud depart, Noeud arrivee)
+        public static Noeud<Station>[] dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
         {
             bool[] visite = new bool[graphe.noeuds.Count()];
             int[] poids = new int[graphe.noeuds.Count()];
-            Noeud[] ordre = new Noeud[graphe.noeuds.Count()];
+            Noeud<Station>[] ordre = new Noeud<Station>[graphe.noeuds.Count()];
             for (int j=0; j<graphe.noeuds.Count(); j++)
             {
                 poids[j] = int.MaxValue;
                 ordre[j] = null;
             }
             poids[depart.Id - 1] = 0;
-            List<Noeud> file = new List<Noeud>(graphe.noeuds);
+            List<Noeud<Station>> file = new List<Noeud<Station>>(graphe.noeuds);
             while(file.Count > 0)
             {
-                Noeud n = null;
+                Noeud<Station> n = null;
                 int mini_poids = int.MaxValue;
-                foreach(Noeud noeud in file)
+                foreach(Noeud<Station> noeud in file)
                 {
                     if (visite[noeud.Id -1] == false && poids[noeud.Id - 1] < mini_poids)
                     {
@@ -45,7 +45,7 @@ namespace PSI
                     }
                     else
                     {
-                        foreach(Noeud voisin in graphe.liste_adjacence[n])
+                        foreach(Noeud<Station> voisin in graphe.liste_adjacence[n])
                         {
                             if (visite[voisin.Id - 1] == false)
                             {
@@ -66,8 +66,8 @@ namespace PSI
                 }
 
             }
-            List<Noeud> chemin = new List<Noeud>();
-            Noeud actuel = arrivee;
+            List<Noeud<Station>> chemin = new List<Noeud<Station>>();
+            Noeud<Station> actuel = arrivee;
             while (actuel != null)
             {
                 chemin.Add(actuel);
