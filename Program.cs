@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using static System.Collections.Specialized.BitVector32;
 
 
 namespace PSI
@@ -98,42 +99,48 @@ namespace PSI
 
             }
 
+            // Ajout liens
 
 
 
-            //ajout lien 
+            // Déclaration de la liste d'exceptions pour les stations de la 7bis
+            List<string> exceptions = new List<string> { "place des fetes", "pres saint gervais", "danube" };
+
+            // Ajout des liens principaux
             List<Lien> liens = new List<Lien>();
 
+            // Dictionnaire associant chaque nœud à son temps de changement (colonne [i,5])
+            Dictionary<Noeud<Station>, int> nodeTransferTimes = new Dictionary<Noeud<Station>, int>();
 
-            // Boucle sur la matrice en ignorant la ligne 0.
+            // Boucle sur la matrice (ignorer l'entête à la ligne 0)
             for (int i = 1; i < matrice_station.GetLength(0); i++)
             {
-                // Calcul de l'indice dans la liste de nœuds (décalage de 1)
                 int index = i - 1;
+                int transferTime = 0;
+                if (!string.IsNullOrEmpty(matrice_arc[i, 5]))
+                {
+                    if (!int.TryParse(matrice_arc[i, 5], out transferTime))
+                    {
+                        transferTime = 0;
+                    }
+                }
+                nodeTransferTimes[noeuds_temp[index]] = transferTime;
 
+                // Récupération du nœud précédent
                 Noeud<Station> prec = new Noeud<Station>(0, null);
-                if (matrice_arc.GetLength(1) > 2 && !string.IsNullOrEmpty(matrice_arc[i, 2]) && index - 1 >= 0)
+                if (matrice_arc.GetLength(1) > 2 && !string.IsNullOrEmpty(matrice_arc[i, 2]) && (index - 1) >= 0)
                 {
                     prec = noeuds_temp[index - 1];
                 }
 
-
+                // Récupération du nœud suivant
                 Noeud<Station> suiv = new Noeud<Station>(0, null);
                 if (matrice_arc.GetLength(1) > 3 && !string.IsNullOrEmpty(matrice_arc[i, 3]) && (index + 1) < noeuds_temp.Count)
                 {
                     suiv = noeuds_temp[index + 1];
                 }
 
-                int temp_changement = 0;
-                if (matrice_arc.GetLength(1) > 5 && !string.IsNullOrEmpty(matrice_arc[i, 5]))
-                {
-                    if (!int.TryParse(matrice_arc[i, 5], out temp_changement))
-                    {
-                        temp_changement = 0;
-                    }
-                }
-
-
+                int temp_changement = transferTime; // Réutilisation de transferTime
                 int tempsEntre = 0;
                 if (matrice_arc.GetLength(1) > 4 && !string.IsNullOrEmpty(matrice_arc[i, 4]))
                 {
@@ -142,11 +149,45 @@ namespace PSI
                         tempsEntre = 0;
                     }
                 }
-
-
                 liens.Add(new Lien(noeuds_temp[index], prec, suiv, tempsEntre, temp_changement));
+                // Pour les stations de la 7bis qui font partie des exceptions, ajouter le lien une seule fois
+                if (noeuds_temp[index].Station.Ligne == "7bis" &&
+                    exceptions.Contains(noeuds_temp[index].Station.Nom_station.ToLower()))
+                {
+                    // Vérifier si un lien avec le nœud "suiv" n'a pas déjà été ajouté
+                    if (!liens.Any(l => l.Station.Id == noeuds_temp[index].Id && l.Suivant.Id == suiv.Id))
+                    {
+                        
+                    }
+                }
+                else
+                {
+                    liens.Add(new Lien(noeuds_temp[index], suiv, prec, tempsEntre, temp_changement));
+                   
+                }
             }
 
+            // ---------------------------------------------------------------------------------
+            // Ajout de liens de transfert entre stations portant le même nom.
+            // On utilise le temps de changement (colonne [i,5]) récupéré pour chaque nœud.
+            var groupedNodes = noeuds_temp.GroupBy(n => n.Station.Nom_station);
+            foreach (var group in groupedNodes)
+            {
+                var nodesWithSameName = group.ToList();
+                if (nodesWithSameName.Count > 1)
+                {
+                    int transferTime = nodeTransferTimes[nodesWithSameName[0]];
+                    for (int i = 0; i < nodesWithSameName.Count; i++)
+                    {
+                        for (int j = i + 1; j < nodesWithSameName.Count; j++)
+                        {
+                            // Ajout dans les deux sens
+                            liens.Add(new Lien(nodesWithSameName[i], nodesWithSameName[j], nodesWithSameName[j], 0, transferTime));
+                            liens.Add(new Lien(nodesWithSameName[j], nodesWithSameName[i], nodesWithSameName[i], 0, transferTime));
+                        }
+                    }
+                }
+            }
 
 
 
@@ -167,9 +208,9 @@ namespace PSI
             //Console.WriteLine("Matrice d'adjacence :");
             //graphe.Affichier_matrice_adj();
 
-            GraphVisualizer visualizer = new GraphVisualizer(graphe);
+           GraphVisualizer visualizer = new GraphVisualizer(graphe);
            
-            visualizer.GenererImage("graphe.png");
+           visualizer.GenererImage("graphe.png");
             visualizer.AfficherImage("graphe.png");
 
             //// Test DFS
@@ -197,13 +238,13 @@ namespace PSI
 
 
             // test lien 
-            //Console.WriteLine("\nListe des liens créés :");
-            //foreach (Lien lien in liens)
-            //{
-            //Console.WriteLine(lien.Temps_entre_2_stations);
-            //}
-            //Console.WriteLine(liens.Count());
-            //Console.WriteLine(noeuds_temp.Count());
+            Console.WriteLine("\nListe des liens créés :");
+            foreach (Lien lien in liens)
+            {
+                Console.WriteLine(lien.ToString());
+            }
+            Console.WriteLine(liens.Count());
+            Console.WriteLine(noeuds_temp.Count());
 
 
             //TEST STATIONS

@@ -49,5 +49,15 @@ namespace PSI
             get { return temps_de_changement; }
         }
 
+        public override string ToString()
+        {
+            string nomStation = station?.Station?.Nom_station ?? "inconnu";
+            string nomPrec = precedent?.Station?.Nom_station ?? "inconnu";
+            string nomSuiv = suivant?.Station?.Nom_station ?? "inconnu";
+
+            return nomStation + " le prec est " + nomPrec + " la suiv est " + nomSuiv +
+                   Convert.ToString(Temps_entre_2_stations) + Convert.ToString(Temps_de_changement);
+        }
+
     }
 }
