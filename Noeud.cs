@@ -28,7 +28,7 @@ namespace PSI
         }
 
        
-        public string toString()
+        public override string  ToString()
         {
             return ($"id : {this.id}, La station {this.station.Nom_station} de la ligne {this.station.Ligne} " +
                 $"se situe a {this.station.Commune_nom} ({this.station.Commune_code}), aux coordonnées {this.station.Longitude} {this.station.Latitude}.");

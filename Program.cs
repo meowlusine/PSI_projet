@@ -48,7 +48,7 @@ namespace PSI
             //Console.WriteLine("Première ligne (ID Station, Libelle Line, etc.):");
             //for (int i = 1; i < matrice_station.GetLength(1); i++)
             //{
-                //Console.Write(matrice_station[0, i] + " | ");
+            //Console.Write(matrice_station[0, i] + " | ");
             //}
             //Console.WriteLine();
 
@@ -81,21 +81,21 @@ namespace PSI
 
             List<Noeud<Station>> noeuds_temp = new List<Noeud<Station>>();
             for (int i = 0; i < stations.Count; i++)
-            { 
-                    noeuds_temp.Add(new Noeud<Station>(i + 1, stations[i]));
-                
+            {
+                noeuds_temp.Add(new Noeud<Station>(i + 1, stations[i]));
+
             }
             List<Noeud<Station>> noeuds = new List<Noeud<Station>>();
             List<string> nom_noeuds = new List<string>();
-           
+
             for (int i = 0; i < stations.Count; i++)
             {
                 if (!nom_noeuds.Contains(noeuds_temp[i].Station.Nom_station))
                 {
                     nom_noeuds.Add(noeuds_temp[i].Station.Nom_station);
-                    noeuds.Add(new Noeud<Station>(int.Parse(matrice_station[i+1,0]), stations[i]));
+                    noeuds.Add(new Noeud<Station>(int.Parse(matrice_station[i + 1, 0]), stations[i]));
                 }
-               
+
             }
 
 
@@ -103,7 +103,7 @@ namespace PSI
 
             //ajout lien 
             List<Lien> liens = new List<Lien>();
-           
+
 
             // Boucle sur la matrice en ignorant la ligne 0.
             for (int i = 1; i < matrice_station.GetLength(0); i++)
@@ -117,7 +117,7 @@ namespace PSI
                     prec = noeuds_temp[index - 1];
                 }
 
-               
+
                 Noeud<Station> suiv = new Noeud<Station>(0, null);
                 if (matrice_arc.GetLength(1) > 3 && !string.IsNullOrEmpty(matrice_arc[i, 3]) && (index + 1) < noeuds_temp.Count)
                 {
@@ -133,7 +133,7 @@ namespace PSI
                     }
                 }
 
-                
+
                 int tempsEntre = 0;
                 if (matrice_arc.GetLength(1) > 4 && !string.IsNullOrEmpty(matrice_arc[i, 4]))
                 {
@@ -143,7 +143,7 @@ namespace PSI
                     }
                 }
 
-               
+
                 liens.Add(new Lien(noeuds_temp[index], prec, suiv, tempsEntre, temp_changement));
             }
 
@@ -152,7 +152,7 @@ namespace PSI
 
 
             //Creation graphe 
-            Graphe<Station> graphe = new Graphe<Station>(noeuds);
+            Graphe<Station> graphe = new Graphe<Station>(noeuds_temp );
 
             // Ajoute les liens dans le graphe
             foreach (var lien in liens)
@@ -161,42 +161,46 @@ namespace PSI
             }
 
             // Affiche la liste d'adjacence
-            graphe.Afficher_liste_adj();
+            //.Afficher_liste_adj();
 
-            // Affichage de la matrice d'adjacence
+            //Affichage de la matrice d'adjacence
             //Console.WriteLine("Matrice d'adjacence :");
             //graphe.Affichier_matrice_adj();
 
+            GraphVisualizer visualizer = new GraphVisualizer(graphe);
+           
+            visualizer.GenererImage("graphe.png");
+            visualizer.AfficherImage("graphe.png");
 
-            // Test DFS
-            Console.WriteLine("\nTest DFS depuis Station 1 :");
-            graphe.DFS(noeuds[0]);
+            //// Test DFS
+            //Console.WriteLine("\nTest DFS depuis Station 1 :");
+            //graphe.DFS(noeuds[0]);
 
-            // Test BFS
-            Console.WriteLine("\nTest BFS depuis Station 1 :");
-            graphe.BFS(noeuds[0]);
+            //// Test BFS
+            //Console.WriteLine("\nTest BFS depuis Station 1 :");
+            //graphe.BFS(noeuds[0]);
 
-            // Vérification si le graphe est connexe
-            Console.WriteLine("\nLe graphe est-il connexe ? " + graphe.EstConnexe());
-
-
-            // Pause pour voir le résultat dans une application console classique
-            Console.WriteLine("\nAppuyez sur une touche pour fermer...");
-            Console.ReadKey();
-            
+            //// Vérification si le graphe est connexe
+            //Console.WriteLine("\nLe graphe est-il connexe ? " + graphe.EstConnexe());
 
 
+            //// Pause pour voir le résultat dans une application console classique
+            //Console.WriteLine("\nAppuyez sur une touche pour fermer...");
+            //Console.ReadKey();
 
 
 
-        
 
 
-             // test lien 
+
+
+
+
+            // test lien 
             //Console.WriteLine("\nListe des liens créés :");
             //foreach (Lien lien in liens)
             //{
-                //Console.WriteLine(lien.Temps_entre_2_stations);
+            //Console.WriteLine(lien.Temps_entre_2_stations);
             //}
             //Console.WriteLine(liens.Count());
             //Console.WriteLine(noeuds_temp.Count());
@@ -215,14 +219,16 @@ namespace PSI
             //Console.WriteLine("Liste des Noeuds :");
             //foreach (var noeud in noeuds)
             //{
-                //Affiche chaque noeud avec son contenu (via ToString)
-                //Console.WriteLine(noeud.ToString());
+            //Affiche chaque noeud avec son contenu (via ToString)
+            //Console.WriteLine(noeud.ToString());
             //}
 
 
         }
     }
 }
+
+
 
 
 

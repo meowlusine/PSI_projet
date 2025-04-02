@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PSI
 {
-    public class Graphe<T> where T : Station ,new()
+    public class Graphe<T> where T : Station, new()
     {
 
         public Dictionary<Noeud<T>, List<Noeud<T>>> liste_adjacence;
@@ -16,17 +16,17 @@ namespace PSI
 
         public Graphe(List<Noeud<T>> noeuds)
         {
-            this.noeuds = noeuds;  
+            this.noeuds = noeuds;
             this.liste_adjacence = new Dictionary<Noeud<T>, List<Noeud<T>>>();
 
             // Initialisation de la liste d'adjacence pour chaque noeud
-            foreach (var noeud in noeuds)
+            foreach (var Noeud in noeuds)
             {
-                liste_adjacence[noeud] = new List<Noeud<T>>();  // La clé est le Noeud<T>
+                liste_adjacence[Noeud] = new List<Noeud<T>>();  // La clé est le Noeud<T>
             }
 
             this.matrice_adjacence = new int[noeuds.Count, noeuds.Count];  // Création de la matrice d'adjacence
-        
+
         }
 
         /// <summary>
@@ -38,12 +38,15 @@ namespace PSI
             Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
             Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
 
-            int stationIndex = lien.Station.Id - 1;
-            int suivantIndex = lien.Suivant.Id - 1;
+            // Recherche de l'indice réel dans la liste
+            int stationIndex = noeuds.IndexOf(station);
+            int suivantIndex = noeuds.IndexOf(suivant);
 
             if (stationIndex >= 0 && stationIndex < noeuds.Count && suivantIndex >= 0 && suivantIndex < noeuds.Count)
             {
-                this.liste_adjacence[noeuds[stationIndex]].Add(noeuds[suivantIndex]);
+                this.liste_adjacence[station].Add(suivant);
+                this.matrice_adjacence[stationIndex, suivantIndex] = 1;
+                this.matrice_adjacence[suivantIndex, stationIndex] = 1;
             }
             else
             {
@@ -51,12 +54,13 @@ namespace PSI
             }
         }
 
+
         public void Afficher_liste_adj()
         {
-            foreach(Noeud<T> noeud in this.liste_adjacence.Keys)
+            foreach (Noeud<T> noeud in this.liste_adjacence.Keys)
             {
                 Console.WriteLine(noeud.ToString() + "\nLien avec  : ");
-                foreach(Noeud<T> lie in liste_adjacence[noeud])
+                foreach (Noeud<T> lie in liste_adjacence[noeud])
                 {
                     Console.Write(lie.ToString() + ", ");
                 }
@@ -71,7 +75,8 @@ namespace PSI
             {
                 for (int j = 0; j < taille; j++)
                 {
-                    Console.Write(this.matrice_adjacence[i, j] + " ");
+                    Console.Write($"{this.matrice_adjacence[i, j],2} ");
+
                 }
                 Console.WriteLine();
             }
@@ -89,18 +94,18 @@ namespace PSI
 
             pile.Push(depart);
 
-            while(pile.Count > 0)
+            while (pile.Count > 0)
             {
                 Noeud<T> actuel = pile.Pop();
                 int index = actuel.Id - 1;
-                if(visite[index] == false)
+                if (visite[index] == false)
                 {
-                    visite[index]  = true;
+                    visite[index] = true;
                     ordreVisites.Add(actuel);
-                    foreach(Noeud<T> voisin in this.liste_adjacence[actuel])
+                    foreach (Noeud<T> voisin in this.liste_adjacence[actuel])
                     {
                         int voisinIndex = voisin.Id - 1;
-                        if (visite[voisinIndex]== false)
+                        if (visite[voisinIndex] == false)
                         {
                             pile.Push(voisin);
                         }
@@ -131,18 +136,18 @@ namespace PSI
             List<Noeud<T>> ordreVisites = new List<Noeud<T>>();
 
             file.Enqueue(depart);
-            visite[depart.Id-1] = true;
+            visite[depart.Id - 1] = true;
 
-            while(file.Count > 0)
+            while (file.Count > 0)
             {
                 Noeud<T> actuel = file.Dequeue();
-                ordreVisites.Add(actuel) ;
+                ordreVisites.Add(actuel);
 
-                foreach(Noeud<T> voisin in liste_adjacence[actuel] )
+                foreach (Noeud<T> voisin in liste_adjacence[actuel])
                 {
-                    if (visite[voisin.Id -1]== false)
+                    if (visite[voisin.Id - 1] == false)
                     {
-                        visite[voisin.Id -1] = true;
+                        visite[voisin.Id - 1] = true;
                         file.Enqueue(voisin);
                     }
                 }
