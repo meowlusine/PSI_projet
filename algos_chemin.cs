@@ -9,7 +9,7 @@ namespace PSI
     internal class algos_chemin
     {
        
-        public static Noeud<Station>[] dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
+        public static  Noeud<Station>[] dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
         {
             bool[] visite = new bool[graphe.noeuds.Count()];
             int[] poids = new int[graphe.noeuds.Count()];
@@ -78,6 +78,20 @@ namespace PSI
             return chemin.ToArray();
 
         }
+
+        public static List<Noeud<Station>> CreationListeNoeuds( Noeud<Station>[] tab)
+        {
+            if(tab == null || tab.Length == 0){
+                return null;
+            }
+            List<Noeud<Station>> list= new List<Noeud<Station>>();
+            for (int i = 0; i < tab.Length; i++){
+                list.Add(tab[i]);
+            }
+            return list;
+        }
+
+
 
         
     }
