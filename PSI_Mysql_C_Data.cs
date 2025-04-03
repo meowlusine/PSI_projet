@@ -346,6 +346,57 @@ namespace PSI
             command11.Dispose();
         }
 
+        public void Interface_admin()
+{
+    Console.WriteLine("Que voulez-vous faire ? (entrer le numero)");
+    Console.WriteLine("1.Modification de la base de donnée\n2.Affichage des données");
+    int num = Convert.ToInt32(Console.ReadLine());
+
+    try
+    {
+        string connexionString = "SERVER=localhost;PORT=3306;" +
+                                 "DATABASE=LivInParis;" +
+                                 "UID=root;PASSWORD=kakawete";
+
+        maConnexion = new MySqlConnection(connexionString);
+        maConnexion.Open();
+        Console.WriteLine("Connexion réussie.");
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur de connexion : " + e.Message);
+        // Gérer l'exception selon les besoins
+    }
+    switch (num)
+    {
+        case 1:
+            Console.WriteLine("Entrer votre commande : ");
+            string commande = Convert.ToString(Console.ReadLine());
+            MySqlCommand command1 = maConnexion.CreateCommand();
+            command1.CommandText = commande;
+            command1.Dispose();
+
+            break;
+        case 2:
+            Console.WriteLine("1.Clients\n2.Cuisiniers\n3.Commandes");
+            int choix = Convert.ToInt32(Console.ReadLine());
+            switch (choix)
+            {
+                case 1:
+                    Affichage_client();
+                    break;
+                case 2:
+                    Affichage_cuisinier();
+                    break;
+                case 3:
+
+                    break;
+            }
+
+            break;
+
+    }
+
         public void Affichage_client()
         {
             string Affichage_client = "SELECT * FROM utilisateur ORDER BY nom ASC, prenom, numero_de_rue  ASC;";
