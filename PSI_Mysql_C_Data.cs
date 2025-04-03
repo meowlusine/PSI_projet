@@ -241,8 +241,8 @@ namespace PSI
             }
             command6.Dispose();
 
-            string Peuplement_commande = "INSERT INTO commande (id_cuisinier, id_client,date_commande)" +
-               "\r\nVALUES (1, 6,'2020-03-05 08:15:54'),(2, 7,'2021-06-09 17:54:21'),(3, 8,'2025-01-18 21:16:04'), (1, 9,'2024-12-26 09:04:43'),(2, 10,'2024-10-14 16:31:57');";
+            string Peuplement_commande = "INSERT INTO commande (id_cuisinier, id_client,date_commande, id_plat)" +
+               "\r\nVALUES (1, 6,'2020-03-05 08:15:54',8),(2, 7,'2021-06-09 17:54:21',7),(3, 8,'2025-01-18 21:16:04',2), (1, 9,'2024-12-26 09:04:43',4),(2, 10,'2024-10-14 16:31:57',11);";
             MySqlCommand command7 = maConnexion.CreateCommand();
             command7.CommandText = Peuplement_commande;
             try
@@ -463,12 +463,14 @@ namespace PSI
                 // Gérer l'exception selon les besoins
             }
             MySqlCommand command12 = maConnexion.CreateCommand();
+            Console.WriteLine("Donnez l'id du cuisisnier");
+            int id = Convert.ToInt32(Console.ReadLine());
             command12.CommandText = "SELECT DISTINCT u.id_utilisateur AS id_utilisateur, u.nom AS nom, u.prenom AS prenom, u.email AS email " +
                            "FROM commande c " +
                            "JOIN client cl ON c.id_client = cl.id_client " +
                            "JOIN utilisateur u ON cl.id_utilisateur = u.id_utilisateur " +
-                           "WHERE c.id_cuisinier = 1";
-            Console.WriteLine("les clients que le cuisinier 1 a pu servir depuis son inscription à la plateforme");
+                           "WHERE c.id_cuisinier = "+id;
+            Console.WriteLine("les clients que le cuisinier "+id+" a pu servir depuis son inscription à la plateforme");
             MySqlDataReader reader = command12.ExecuteReader();
             while (reader.Read())
             {
@@ -493,12 +495,12 @@ namespace PSI
 
             Console.WriteLine("depuis quand voulez-vous savoir les plats que le cuisinier a préparé ? sous le format AAAA-MM-JJ HH:MM:SS");
             DateTime date = Convert.ToDateTime(Console.ReadLine());
-            Console.WriteLine("les clients que le cuisinier 1 a pu servir depuis le " + Convert.ToString(date));
+            Console.WriteLine("les clients que le cuisinier "+id+" a pu servir depuis le " + Convert.ToString(date));
             MySqlCommand command13 = maConnexion.CreateCommand();
             command13.CommandText = "SELECT DISTINCT u.id_utilisateur, u.nom, u.prenom, u.email " +
                 "FROM commande c JOIN client cl ON c.id_client = cl.id_client JOIN utilisateur u" +
-                " ON cl.id_utilisateur = u.id_utilisateur WHERE c.id_cuisinier = 1 " +
-                "AND c.date_commande BETWEEN '" + date + "' AND CURDATE(); ";
+                " ON cl.id_utilisateur = u.id_utilisateur WHERE c.id_cuisinier =  " +id+
+                " AND c.date_commande BETWEEN '" + date + "' AND CURDATE(); ";
 
             MySqlDataReader reader1 = command13.ExecuteReader();
             while (reader1.Read())
@@ -557,6 +559,163 @@ namespace PSI
             }
         }
 
+        public void Affichage_statistiques()
+        {
+            try
+            {
+                string connexionString = "SERVER=localhost;PORT=3306;" +
+                                         "DATABASE=LivInParis;" +
+                                         "UID=root;PASSWORD=kakawete";
+
+                maConnexion = new MySqlConnection(connexionString);
+                maConnexion.Open();
+                Console.WriteLine("Connexion réussie.");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                // Gérer l'exception selon les besoins
+            }
+
+            //Console.WriteLine(" le nombre de livraisons effectuées par cuisinier");
+            //string requete = "SELECT id_cuisinier, COUNT(*) AS nb_livraisons FROM livraison GROUP BY id_cuisinier;";
+
+            //MySqlCommand cmdLivraison = new MySqlCommand(requete, maConnexion);
+            //MySqlDataReader readerLivraison = cmdLivraison.ExecuteReader();
+
+            //while (readerLivraison.Read())
+            //{
+            //    try
+            //    {
+            //        int idCuisinier = Convert.ToInt32(readerLivraison["id_cuisinier"]);
+            //        int nbLivraisons = Convert.ToInt32(readerLivraison["nb_livraisons"]);
+            //        Console.WriteLine($"Cuisinier {idCuisinier} a effectué {nbLivraisons} livraisons.");
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+            //    }
+            //}
+            //readerLivraison.Close();
+
+            //Console.WriteLine();
+
+
+            //Console.WriteLine(" les commandes selon une période de temps");
+            //Console.WriteLine("La premiere date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
+            //DateTime date1 = Convert.ToDateTime(Console.ReadLine());
+
+            //Console.WriteLine("La deuxieme date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
+            //DateTime date2 = Convert.ToDateTime(Console.ReadLine());
+
+            //string requeteCommande = @" SELECT * FROM commande WHERE date_commande BETWEEN @date1 AND @date2 ORDER BY date_commande;";
+
+            //using (MySqlCommand cmdCommande = new MySqlCommand(requeteCommande, maConnexion))
+            //{
+            //    // Paramètres
+            //    cmdCommande.Parameters.Add("@date1", MySqlDbType.DateTime).Value = date1;
+            //    cmdCommande.Parameters.Add("@date2", MySqlDbType.DateTime).Value = date2;
+
+            //    using (MySqlDataReader readerCommande = cmdCommande.ExecuteReader())
+            //    {
+            //        while (readerCommande.Read())
+            //        {
+            //            try
+            //            {
+            //                int idCommande = Convert.ToInt32(readerCommande["id_commande"]);
+            //                int idCuisinier = Convert.ToInt32(readerCommande["id_cuisinier"]);
+            //                int idClient = Convert.ToInt32(readerCommande["id_client"]);
+            //                DateTime dateCommande = Convert.ToDateTime(readerCommande["date_commande"]);
+
+            //                Console.WriteLine($"Commande {idCommande}: Cuisinier {idCuisinier}, Client {idClient}, Date {dateCommande}");
+            //            }
+            //            catch (Exception ex)
+            //            {
+            //                Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+            //            }
+            //        }
+            //    }
+            //}
+
+            //Console.WriteLine();
+
+
+
+            //string requeteMoyennePrix = " SELECT AVG(t.montant_total) AS moyenne_prix FROM commande c JOIN transaction_commande tc ON c.id_commande = tc.id_commande JOIN `transaction` t ON tc.id_transaction = t.id_transaction;";
+
+            //using (MySqlCommand cmdMoyennePrix = new MySqlCommand(requeteMoyennePrix, maConnexion))
+            //{
+            //    object resultPrix = cmdMoyennePrix.ExecuteScalar();
+            //    if (resultPrix != null && resultPrix != DBNull.Value)
+            //    {
+            //        decimal moyennePrix = Convert.ToDecimal(resultPrix);
+            //        Console.WriteLine($"La moyenne des prix des commandes est : {moyennePrix}");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("Aucune donnée disponible pour calculer la moyenne.");
+            //    }
+            //}
+            //Console.WriteLine();
+
+            //Console.WriteLine("moyenne des comptes clients :");
+            //string queryMoyenneCommandes = @"SELECT AVG(nb_commandes) AS moyenne_commandes FROM (SELECT id_client, COUNT(*) AS nb_commandes FROM commande GROUP BY id_client) AS sub;";
+
+            //MySqlCommand cmdMoyenneCommandes = new MySqlCommand(queryMoyenneCommandes, maConnexion);
+            //object resultMoyenne = cmdMoyenneCommandes.ExecuteScalar();
+            //if (resultMoyenne != null)
+            //{
+            //    decimal moyenneCommandes = Convert.ToDecimal(resultMoyenne);
+            //    Console.WriteLine($"La moyenne des commandes par client est : {moyenneCommandes}");
+            //}
+            //Console.WriteLine();
+
+
+            int clientId = 6; // Par exemple, à remplacer par l'ID du client recherché
+            string origineRecherche = "Française"; // Modifier selon la nationalité recherchée
+
+            string queryCommandesClient = "SELECT DISTINCT c.id_commande, c.date_commande, cl.id_client, u.nom AS nom_client, u.prenom AS prenom_client, p.origine FROM commande c " +
+                " JOIN client cl ON c.id_client = cl.id_client JOIN utilisateur u ON cl.id_utilisateur = u.id_utilisateur JOIN plat p ON c.id_cuisinier = p.id_cuisinier " +
+                "WHERE cl.id_client = @clientId AND c.date_commande BETWEEN '2020-01-01' AND '2024-12-31' AND p.origine = @origineRecherche ORDER BY c.date_commande;";
+
+            MySqlCommand cmdCommandesClient = new MySqlCommand(queryCommandesClient, maConnexion);
+            cmdCommandesClient.Parameters.AddWithValue("@clientId", clientId);
+            cmdCommandesClient.Parameters.AddWithValue("@origineRecherche", origineRecherche);
+
+            MySqlDataReader readerCommandes = cmdCommandesClient.ExecuteReader();
+
+            while (readerCommandes.Read())
+            {
+                try
+                {
+                    int idCommande = Convert.ToInt32(readerCommandes["id_commande"]);
+                    DateTime dateCommande = Convert.ToDateTime(readerCommandes["date_commande"]);
+                    int idClient = Convert.ToInt32(readerCommandes["id_client"]);
+                    string nomClient = readerCommandes["nom_client"].ToString();
+                    string prenomClient = readerCommandes["prenom_client"].ToString();
+                    string origine = readerCommandes["origine"].ToString();
+
+                    Console.WriteLine($"Commande {idCommande} pour le client {nomClient} {prenomClient} (ID: {idClient}) le {dateCommande:d}, Plat d'origine: {origine}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                }
+            }
+            readerCommandes.Close();
+
+
+
+
+
+            if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
+            {
+                maConnexion.Close();
+                Console.WriteLine("Connexion fermée.");
+            }
+            Console.WriteLine();
+        }
+
         public void Interface_admin()
         {
             Console.WriteLine("Que voulez-vous faire ? (entrer le numero)");
@@ -607,44 +766,41 @@ namespace PSI
                     break;
 
             }
-
-             public void Affichage_commande()
- {
-     Console.WriteLine("Quel est le numéro de commande ? ");
-     int numero = Convert.ToInt32(Console.ReadLine());
-
-     // Récupération du montant de la commande
-     string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
-                           "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
-
-     MySqlCommand command0 = new MySqlCommand(commande, maConnexion);
-     command0.Parameters.AddWithValue("@numero", numero);
-     object montant = command0.ExecuteScalar();
-     Console.WriteLine($"Montant total : {montant} €");
-
-     // Récupération de la station de métro du client
-     string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
-                               "(SELECT id_utilisateur FROM client WHERE id_client = " +
-                               "(SELECT id_client FROM commande WHERE id_commande = @numero))";
-
-     MySqlCommand command1 = new MySqlCommand(queryMetroClient, maConnexion);
-     command1.Parameters.AddWithValue("@numero", numero);
-     object metroClient = command1.ExecuteScalar();
-     Console.WriteLine($"Métro client : {metroClient}");
-
-     // Récupération de la station de métro du cuisinier
-     string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
-                                  "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
-                                  "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
-
-     MySqlCommand command2 = new MySqlCommand(queryMetroCuisinier, maConnexion);
-     command2.Parameters.AddWithValue("@numero", numero);
-     object metroCuisinier = command2.ExecuteScalar();
-     Console.WriteLine($"Métro cuisinier : {metroCuisinier}");
- }
-
-
-
         }
+        public void Affichage_commande()
+        {
+            Console.WriteLine("Quel est le numéro de commande ? ");
+            int numero = Convert.ToInt32(Console.ReadLine());
+
+            // Récupération du montant de la commande
+            string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
+                                  "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
+
+            MySqlCommand command0 = new MySqlCommand(commande, maConnexion);
+            command0.Parameters.AddWithValue("@numero", numero);
+            object montant = command0.ExecuteScalar();
+            Console.WriteLine($"Montant total : {montant} €");
+
+            // Récupération de la station de métro du client
+            string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
+                                      "(SELECT id_utilisateur FROM client WHERE id_client = " +
+                                      "(SELECT id_client FROM commande WHERE id_commande = @numero))";
+
+            MySqlCommand command1 = new MySqlCommand(queryMetroClient, maConnexion);
+            command1.Parameters.AddWithValue("@numero", numero);
+            object metroClient = command1.ExecuteScalar();
+            Console.WriteLine($"Métro client : {metroClient}");
+
+            // Récupération de la station de métro du cuisinier
+            string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
+                                         "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
+                                         "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
+
+            MySqlCommand command2 = new MySqlCommand(queryMetroCuisinier, maConnexion);
+            command2.Parameters.AddWithValue("@numero", numero);
+            object metroCuisinier = command2.ExecuteScalar();
+            Console.WriteLine($"Métro cuisinier : {metroCuisinier}");
+        }
+
     }
 }
