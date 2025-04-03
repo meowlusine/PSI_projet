@@ -30,7 +30,7 @@ namespace PSI
         }
 
         /// <summary>
-        /// ajoute un lien de type Lien dans la liste d'adjacence et dans la matrice d'adjacence
+        /// Ajoute un lien de type Lien dans la liste d'adjacence et dans la matrice d'adjacence
         /// </summary>
         /// <param name="lien"></param>
         public void AjouterLien(Lien lien)
@@ -48,10 +48,7 @@ namespace PSI
                 this.matrice_adjacence[stationIndex, suivantIndex] = 1;
                 this.matrice_adjacence[suivantIndex, stationIndex] = 1;
             }
-            else
-            {
-                Console.WriteLine($"Index hors limites : Station {lien.Station.Id} ou Suivant {lien.Suivant.Id}");
-            }
+            
         }
 
 
@@ -83,7 +80,7 @@ namespace PSI
         }
 
         /// <summary>
-        /// parcours en profondeurs du graphe utilisant la liste d'adjacence
+        /// Parcours en profondeurs du graphe utilisant la liste d'adjacence
         /// </summary>
         /// <param name="depart"></param>
         public bool[] DFS(Noeud<T> depart)
@@ -126,7 +123,7 @@ namespace PSI
         }
 
         /// <summary>
-        /// parcours en largeurs du graphe en utilisant la liste d'adjacence
+        /// Parcours en largeurs du graphe en utilisant la liste d'adjacence
         /// </summary>
         /// <param name="depart"></param>
         public bool[] BFS(Noeud<T> depart)
@@ -167,6 +164,191 @@ namespace PSI
             bool[] visite = this.DFS(this.noeuds[0]); // On commence le DFS depuis le premier nœud
             return visite.All(v => v); // Vérifie si tous les nœuds ont été visités
         }
+        
+        #region BellmanFord
+        public List<Noeud<T>> BellmanFord(Noeud<T> depart, Noeud<T> arrivee, List<Lien> liens)
+        {
+            if (!noeuds.Contains(depart))
+            {
+                Console.WriteLine("Le point de départ n'existe pas dans le graphe.");
+                return null;
+            }
+
+            Dictionary<Noeud<T>, int> distance = new Dictionary<Noeud<T>, int>();
+            Dictionary<Noeud<T>, Noeud<T>> predecesseur = new Dictionary<Noeud<T>, Noeud<T>>();
+
+            foreach (var noeud in noeuds) 
+            {
+                distance[noeud] = int.MaxValue;
+                predecesseur[noeud] = null;
+            }
+            distance[depart] = 0;
+
+            int nbNoeuds = noeuds.Count;
+            bool miseAJour;
+
+            for (int i = 0; i < nbNoeuds - 1; i++)
+            {
+                miseAJour = false;
+                foreach (var lien in liens)
+                {
+                    Noeud<T> station = TrouverNoeudParId(lien.Station.Id);
+                    Noeud<T> suivant = TrouverNoeudParId(lien.Suivant.Id);
+
+                    if (station != null && suivant != null && distance[station] != int.MaxValue)
+                    {
+                        int poids = lien.Temps_entre_2_stations;
+                        if (station.Station.Ligne != suivant.Station.Ligne) 
+                        {
+                            poids += lien.Temps_de_changement;
+                        }
+
+                        
+                        if (distance[station] + poids < distance[suivant])
+                        {
+                            distance[suivant] = distance[station] + poids;
+                            predecesseur[suivant] = station;
+                            miseAJour = true;
+
+                            if (suivant.Equals(arrivee))
+                            {
+                                
+                                Noeud<T> stationPrecedente = predecesseur[arrivee]; // La station précédente de la station d'arrivée
+                                if (stationPrecedente != null)
+                                {
+                                    Lien dernierLien = null;
+
+                                    foreach (var l in liens)
+                                    {
+                                        if ((l.Station.Id == stationPrecedente.Id && l.Suivant.Id == arrivee.Id) || (l.Station.Id == arrivee.Id && l.Suivant.Id == stationPrecedente.Id)) 
+                                        {
+                                            dernierLien = l;
+                                        }
+                                    }
+
+                                    // Si un dernier lien a été trouvé, on ajoute son temps de trajet
+                                    if (dernierLien != null)
+                                    {
+                                        distance[suivant] += dernierLien.Temps_entre_2_stations; // Ajout du dernier temps de trajet
+                                    } 
+                                }
+                    
+                            }
+                        }
+                    }
+                }
+                if (!miseAJour)
+                {
+                    return null;
+                }
+            }
+            //return ConstruireGraphe(predecesseur, arrivee, liens);
+            List<Noeud<T>> chemin = new List<Noeud<T>>();
+            Noeud<T> courant = arrivee;
+
+            // Remonter les prédécesseurs depuis l'arrivée jusqu'au départ
+            while (courant != null)
+            {
+                chemin.Insert(0, courant); // Insertion au début pour avoir l'ordre du départ à l'arrivée
+                courant = predecesseur[courant];
+            }
+
+            // Vérification si un chemin a été trouvé
+            if (chemin.Count == 0 || chemin[0] != depart)
+            {
+                Console.WriteLine("Aucun chemin trouvé entre " + depart.Station.Nom_station + 
+                                " et " + arrivee.Station.Nom_station);
+                return null;
+            }
+
+            // Affichage du chemin et de la distance totale
+            Console.WriteLine("Chemin trouvé de " + depart.Station.Nom_station + 
+                            " à " + arrivee.Station.Nom_station + " :");
+            foreach (var noeud in chemin)
+            {
+                Console.Write(noeud.Station.Nom_station + " -> ");
+            }
+            Console.WriteLine("\nDistance totale : " + distance[arrivee]);
+
+            AfficherChemin(predecesseur, depart, arrivee, distance[arrivee]);
+
+            return chemin;
+        }
+
+        /// <summary>
+        /// Fonction pour trouver nœud par son id 
+        /// </summary>
+        private Noeud<T> TrouverNoeudParId(int id)
+        {
+            foreach (Noeud<T> noeud in noeuds)
+            {
+                if (noeud.Id == id)
+                {
+                    return noeud;
+                }
+            }
+            return null;
+        }
+
+
+       
+        public static Graphe<T> CreerGrapheDuChemin(List<Noeud<T>> chemin, List<Lien> tousLesLiens)
+        {
+            if (chemin == null || chemin.Count < 2)
+            {
+                Console.WriteLine("Le chemin est trop court pour créer un graphe.");
+                return null;
+            }
+
+            // Créer un nouveau graphe avec les nœuds du chemin
+            Graphe<T> grapheChemin = new Graphe<T>(chemin);
+
+            // Ajouter les liens entre les nœuds consécutifs du chemin
+            for (int i = 0; i < chemin.Count - 1; i++)
+            {
+                Noeud<T> station = chemin[i];
+                Noeud<T> suivant = chemin[i + 1];
+
+                // Trouver le lien correspondant dans la liste complète des liens
+                Lien lien = tousLesLiens.Find(l => (l.Station.Id == station.Id && l.Suivant.Id == suivant.Id) ||(l.Station.Id == suivant.Id && l.Suivant.Id == station.Id));
+
+                if (lien != null)
+                {
+                    grapheChemin.AjouterLien(lien);
+                }
+            }
+
+            return grapheChemin;
+        }
+
+        
+
+        
+
+        /// <summary>
+        /// Fonction pour afficher PCC sur terminal
+        /// </summary>
+        private void AfficherChemin(Dictionary<Noeud<T>, Noeud<T>> predecesseur, Noeud<T> depart, Noeud<T> destination, int distance)
+        {
+            Stack<Noeud<T>> chemin = new Stack<Noeud<T>>();
+            Noeud<T> actuel = destination;
+
+            while (actuel != null)
+            {
+                chemin.Push(actuel);
+                actuel = predecesseur[actuel]; //actualiser 
+            }
+            while (chemin.Count > 1)
+            {
+                Console.Write(chemin.Pop().Station.Nom_station+ "(Ligne " +chemin.Peek().Station.Ligne+") -> ");
+            }
+
+            
+            Console.Write(chemin.Pop().Station.Nom_station);
+            Console.WriteLine();
+            Console.WriteLine("La distance la plus courte de "+ depart.Station.Nom_station+ " jusqu'à "  +destination.Station.Nom_station+ " est " + distance+ " minutes.");
+        }
+        #endregion BellmanFord
 
     }
 }
