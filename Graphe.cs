@@ -79,6 +79,7 @@ namespace PSI
             }
         }
 
+        #region BFS et DFS
         /// <summary>
         /// Parcours en profondeurs du graphe utilisant la liste d'adjacence
         /// </summary>
@@ -122,6 +123,7 @@ namespace PSI
 
         }
 
+
         /// <summary>
         /// Parcours en largeurs du graphe en utilisant la liste d'adjacence
         /// </summary>
@@ -158,16 +160,110 @@ namespace PSI
             Console.WriteLine();
             return visite;
         }
+        #endregion BFS et DFS
 
+        #region Connexité
         public bool EstConnexe()
         {
             bool[] visite = this.DFS(this.noeuds[0]); // On commence le DFS depuis le premier nœud
             return visite.All(v => v); // Vérifie si tous les nœuds ont été visités
         }
-        
+        #endregion Connexité
+
+
+        #region FloydWarshall
+        public (int[,], int[,]) FloydWarshall(List<Lien>liens)
+        {
+            int n = noeuds.Count;
+            int[,] distance = new int[n, n];
+            int[,] pred = new int[n, n]; // Matrice de prédécesseurs
+
+            // Initialisation des matrices de distance et de prédécesseur
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (i == j)
+                        distance[i, j] = 0;
+                    else
+                        distance[i, j] = int.MaxValue; 
+                    pred[i, j] = -1; 
+                }
+            }
+
+                // Remplissage des matrices avec les distances des liens existants
+                foreach (var lien in liens)
+                {
+                    int i = lien.Station.Id - 1; // Id de départ (indexation 0)
+                    int j = lien.Suivant.Id - 1; // Id d'arrivée (indexation 0)
+
+                    // Vérification que les indices i et j sont valides
+                    if (i >= 0 && i < n && j >= 0 && j < n)
+                    {
+                        distance[i, j] = lien.Temps_entre_2_stations; // Temps de trajet
+                        pred[i, j] = i; // Le prédécesseur de j est i (c'est-à-dire qu'on arrive à j depuis i)
+                    }
+                }
+
+                // Application de l'algorithme de Floyd-Warshall
+                for (int k = 0; k < n; k++) // k est le nœud intermédiaire
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        for (int j = 0; j < n; j++)
+                        {
+                            if (distance[i, k] != int.MaxValue && distance[k, j] != int.MaxValue && distance[i, j] > distance[i, k] + distance[k, j])
+                            {
+                                distance[i, j] = distance[i, k] + distance[k, j]; // Mise à jour de la distance
+                                pred[i, j] = pred[k, j]; // Mise à jour du prédécesseur
+                            }
+                        }
+                    }
+                }
+
+                return (distance, pred);
+        }
+
+        public List<Noeud<T>> ReconstruireChemin(int startId, int endId, int[,] pred)
+        {
+            List<Noeud<T>> chemin = new List<Noeud<T>>();
+            int temporaire = endId-1;
+
+            // Vérification de l'existence d'un chemin
+            if (pred[startId, endId] == -1)
+            {
+                Console.WriteLine("Aucun chemin trouvé entre les nœuds.");
+                return chemin;
+            }
+
+            // Reconstruire le chemin en partant de l'arrivée
+            while (temporaire != startId)
+            {
+                chemin.Insert(0, noeuds[temporaire]);
+                temporaire = pred[startId, temporaire];
+
+                // Si un prédécesseur est invalide (ex. -1), arrêtez immédiatement
+                if (temporaire == -1)
+                {
+                    Console.WriteLine("Le chemin est interrompu en raison d'un prédécesseur invalide.");
+                    return chemin;
+                }
+            }
+
+            // Ajouter le nœud de départ au début du chemin
+            chemin.Insert(0, noeuds[startId]);
+            return chemin;
+        }
+        #endregion FloydWarshall
+
+
+
         #region BellmanFord
         public List<Noeud<T>> BellmanFord(Noeud<T> depart, Noeud<T> arrivee, List<Lien> liens)
         {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             if (!noeuds.Contains(depart))
             {
                 Console.WriteLine("Le point de départ n'existe pas dans le graphe.");
@@ -253,17 +349,14 @@ namespace PSI
                 courant = predecesseur[courant];
             }
 
-            // Vérification si un chemin a été trouvé
             if (chemin.Count == 0 || chemin[0] != depart)
             {
-                Console.WriteLine("Aucun chemin trouvé entre " + depart.Station.Nom_station + 
-                                " et " + arrivee.Station.Nom_station);
+                Console.WriteLine("Aucun chemin trouvé entre " + depart.Station.Nom_station + " et " + arrivee.Station.Nom_station);
                 return null;
             }
 
             // Affichage du chemin et de la distance totale
-            Console.WriteLine("Chemin trouvé de " + depart.Station.Nom_station + 
-                            " à " + arrivee.Station.Nom_station + " :");
+            Console.WriteLine("Chemin trouvé de " + depart.Station.Nom_station + " à " + arrivee.Station.Nom_station + " :");
             foreach (var noeud in chemin)
             {
                 Console.Write(noeud.Station.Nom_station + " -> ");
@@ -272,13 +365,16 @@ namespace PSI
 
             AfficherChemin(predecesseur, depart, arrivee, distance[arrivee]);
 
+            stopwatch.Stop();
+            Console.WriteLine("L'algorithme de BellmanFord s'est effectué en: "+stopwatch.ElapsedMilliseconds+"ms");
+
             return chemin;
         }
 
         /// <summary>
         /// Fonction pour trouver nœud par son id 
         /// </summary>
-        private Noeud<T> TrouverNoeudParId(int id)
+        public Noeud<T> TrouverNoeudParId(int id)
         {
             foreach (Noeud<T> noeud in noeuds)
             {
@@ -296,7 +392,7 @@ namespace PSI
         {
             if (chemin == null || chemin.Count < 2)
             {
-                Console.WriteLine("Le chemin est trop court pour créer un graphe.");
+                Console.WriteLine("Le chemin est trop court.");
                 return null;
             }
 
@@ -309,7 +405,6 @@ namespace PSI
                 Noeud<T> station = chemin[i];
                 Noeud<T> suivant = chemin[i + 1];
 
-                // Trouver le lien correspondant dans la liste complète des liens
                 Lien lien = tousLesLiens.Find(l => (l.Station.Id == station.Id && l.Suivant.Id == suivant.Id) ||(l.Station.Id == suivant.Id && l.Suivant.Id == station.Id));
 
                 if (lien != null)
