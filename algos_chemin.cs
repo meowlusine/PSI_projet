@@ -11,6 +11,9 @@ namespace PSI
        
         public static  Noeud<Station>[] dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
         {
+            System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
+            stopwatch2.Start();
+
             bool[] visite = new bool[graphe.noeuds.Count()];
             int[] poids = new int[graphe.noeuds.Count()];
             Noeud<Station>[] ordre = new Noeud<Station>[graphe.noeuds.Count()];
@@ -74,6 +77,10 @@ namespace PSI
                 actuel = ordre[actuel.Id - 1];
             }
             chemin.Reverse();
+
+            stopwatch2.Stop();
+            Console.WriteLine("Temps d'exécution de Dijkstra (en ticks) : " + stopwatch2.ElapsedTicks);
+            Console.WriteLine("Temps d'exécution de Dijkstra(en ms) : " + stopwatch2.Elapsed.TotalMilliseconds);
 
             return chemin.ToArray();
 
