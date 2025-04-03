@@ -90,6 +90,7 @@ CREATE TABLE commande (
 id_commande INT PRIMARY KEY AUTO_INCREMENT,
 id_cuisinier INT ,
 id_client INT ,
+date_commande DATETIME,
 FOREIGN KEY (id_cuisinier) REFERENCES cuisinier(id_cuisinier) ON DELETE CASCADE,
 FOREIGN KEY (id_client) REFERENCES client(id_client) ON DELETE CASCADE
 );
@@ -120,26 +121,7 @@ PRIMARY KEY (id_livraison, id_commande),
 FOREIGN KEY (id_livraison) REFERENCES livraison(id_livraison) ON DELETE CASCADE,
 FOREIGN KEY (id_commande) REFERENCES commande(id_commande) ON DELETE CASCADE
 );
--- peuplement des tables 
-INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) VALUES ('Dupond', 'Marie', 'Mdupond@gmail.com', 'password123', '1234567890', 30, 'Rue de la République', 75011, 'Paris', 'République');
-INSERT INTO cuisinier (id_utilisateur) VALUES (1);
-
-INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) VALUES ('Durand', 'Medhy', 'Mdurand@gmail.com', 'password123', '1234567890', 15, 'Rue Cardinet', 75017, 'Paris', 'Cardinet');
-INSERT INTO client (id_utilisateur, type_client) VALUES (2, 'particulier');
-select * from utilisateur;
-
-INSERT INTO plat (nom_plat, prix, quantite, type_plat, date_fabrication, date_peremption, regime, origine, description_recette, id_cuisinier)
-VALUES ('Raclette', 10.00, 6, 'plat', '2025-01-10', '2025-01-15', 'Française', 'France', 'raclette, pommes de terre, jambon, cornichon', 1), 
-('Salade de fruits', 5.00, 6, 'dessert', '2025-01-10', '2025-01-15', 'Végétarien', 'Indifférent', 'fraise, kiwi, sucre', 1);
-
-INSERT INTO commande (id_cuisinier, id_client) VALUES (1, 1),(1, 1);
-INSERT INTO livraison (id_cuisinier, date_livraison, zone_livraison)VALUES (1, '2025-01-10', 'Paris 17'),(1, '2025-01-10', 'Paris 17');
-select * from livraison;
-INSERT INTO livraison_commande (id_livraison, id_commande)
-VALUES (1, 1),(2, 2);
 
 
--- Afficher les clients par ordre alphabetique et par rue 
-SELECT * FROM utilisateur ORDER BY nom ASC, prenom ASC;
-SELECT * FROM utilisateur ORDER BY rue ASC, numero_de_rue ASC;
+
 
