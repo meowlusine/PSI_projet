@@ -229,7 +229,14 @@ namespace PSI
             //Console.WriteLine("\nAppuyez sur une touche pour fermer...");
             //Console.ReadKey();
 
-
+            // test dijkstra 
+             (Noeud<Station>[] chemin, int temps ) = algos_chemin.dijkstra(graphe, noeuds_temp[0], noeuds_temp[20]);
+             Console.WriteLine("le chemin entre " + noeuds_temp[0].Station.Nom_station + " et " + noeuds_temp[20].Station.Nom_station + " est ");
+             foreach(Noeud<Station> station in chemin)
+            {
+                Console.WriteLine(station.Station.Nom_station);
+             }
+                 Console.WriteLine("\n Ce trajet durera " + temps + " minutes.");
 
 
 
