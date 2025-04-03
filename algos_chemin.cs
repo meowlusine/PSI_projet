@@ -82,7 +82,6 @@ namespace PSI
            chemin.Reverse();
 
            stopwatch2.Stop();
-           Console.WriteLine("Temps d'exécution de Dijkstra (en ticks) : " + stopwatch2.ElapsedTicks);
            Console.WriteLine("Temps d'exécution de Dijkstra(en ms) : " + stopwatch2.Elapsed.TotalMilliseconds);
 
 
