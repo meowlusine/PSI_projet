@@ -1,11 +1,15 @@
 ﻿using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
+using Org.BouncyCastle.Tls.Crypto;
 using SkiaSharp;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Net.Sockets;
+using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Text.RegularExpressions;
 
 namespace PSI
 {
@@ -14,8 +18,10 @@ namespace PSI
     {
         private MySqlConnection maConnexion;
 
+
         public void Peuplement()
         {
+
             try
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
@@ -31,7 +37,6 @@ namespace PSI
                 Console.WriteLine("Erreur de connexion : " + e.Message);
                 // Gérer l'exception selon les besoins
             }
-
 
             string Peuplement = " INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
                 "\r\nVALUES ('Bernorie', 'Louane', 'L.Bernorie@gmail.com', 'mdp123', '1234567891', 645, 'Rue Ribéra', 75016, 'Paris', 'Jasmin');" +
@@ -346,84 +351,117 @@ namespace PSI
             command11.Dispose();
         }
 
-        public void Interface_admin()
-{
-    Console.WriteLine("Que voulez-vous faire ? (entrer le numero)");
-    Console.WriteLine("1.Modification de la base de donnée\n2.Affichage des données");
-    int num = Convert.ToInt32(Console.ReadLine());
-
-    try
-    {
-        string connexionString = "SERVER=localhost;PORT=3306;" +
-                                 "DATABASE=LivInParis;" +
-                                 "UID=root;PASSWORD=kakawete";
-
-        maConnexion = new MySqlConnection(connexionString);
-        maConnexion.Open();
-        Console.WriteLine("Connexion réussie.");
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur de connexion : " + e.Message);
-        // Gérer l'exception selon les besoins
-    }
-    switch (num)
-    {
-        case 1:
-            Console.WriteLine("Entrer votre commande : ");
-            string commande = Convert.ToString(Console.ReadLine());
-            MySqlCommand command1 = maConnexion.CreateCommand();
-            command1.CommandText = commande;
-            command1.Dispose();
-
-            break;
-        case 2:
-            Console.WriteLine("1.Clients\n2.Cuisiniers\n3.Commandes");
-            int choix = Convert.ToInt32(Console.ReadLine());
-            switch (choix)
-            {
-                case 1:
-                    Affichage_client();
-                    break;
-                case 2:
-                    Affichage_cuisinier();
-                    break;
-                case 3:
-
-                    break;
-            }
-
-            break;
-
-    }
-
         public void Affichage_client()
         {
-            string Affichage_client = "SELECT * FROM utilisateur ORDER BY nom ASC, prenom, numero_de_rue  ASC;";
+
+            try
+            {
+                string connexionString = "SERVER=localhost;PORT=3306;" +
+                                         "DATABASE=LivInParis;" +
+                                         "UID=root;PASSWORD=kakawete";
+
+                maConnexion = new MySqlConnection(connexionString);
+                maConnexion.Open();
+                Console.WriteLine("Connexion réussie.");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                // Gérer l'exception selon les besoins
+            }
+
+
+            Console.WriteLine("Liste des clients par ordre alphabetique et de rue ");
+            string Affichage_client = "SELECT * FROM utilisateur join client on utilisateur.id_utilisateur where " +
+                "client.id_utilisateur = utilisateur.id_utilisateur ORDER BY nom ASC, prenom , numero_de_rue ASC;";
 
 
             MySqlCommand command = maConnexion.CreateCommand();
             command.CommandText = Affichage_client;
-            try
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                command.ExecuteNonQuery();
-                Console.WriteLine("Peuplement entreprise reussi");
+
+                try
+                {
+                    int idClient = Convert.ToInt32(reader["id_client"]);
+                    int idUtilisateur = Convert.ToInt32(reader["id_utilisateur"]);
+                    string typeClient = reader["type_client"].ToString();
+                    string nom = reader["nom"].ToString();
+                    string prenom = reader["prenom"].ToString();
+                    string email = reader["email"].ToString();
+                    string motDePasse = reader["mot_de_passe"].ToString();
+                    string telephone = reader["telephone"].ToString();
+                    int numeroDeRue = Convert.ToInt32(reader["numero_de_rue"]);
+                    string rue = reader["rue"].ToString();
+                    int codePostal = Convert.ToInt32(reader["code_postal"]);
+                    string ville = reader["ville"].ToString();
+                    string metro = reader["metro"].ToString();
+
+                    Console.WriteLine($"ID Client: {idClient}, ID Utilisateur: {idUtilisateur}, Type Client: {typeClient}, Nom: {nom}, Prénom: {prenom}, Email: {email}, Mot de passe: {motDePasse}, Téléphone: {telephone}, Numéro de rue: {numeroDeRue}, Rue: {rue}, Code Postal: {codePostal}, Ville: {ville}, Métro: {metro}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                }
 
             }
-            catch (MySqlException e)
+            reader.Close();
+
+            Console.WriteLine();
+            Console.WriteLine("Clients triés par montant cumulé");
+
+            MySqlCommand command1 = maConnexion.CreateCommand();
+            command1.CommandText = " SELECT cl.id_client, u.nom,  u.prenom, SUM(t.montant_total) AS montant_cumul FROM client cl " +
+                "JOIN utilisateur u ON cl.id_utilisateur = u.id_utilisateur JOIN commande c ON cl.id_client = c.id_client " +
+                "JOIN transaction_commande tc ON c.id_commande = tc.id_commande JOIN transaction t ON tc.id_transaction = t.id_transaction " +
+                "GROUP BY cl.id_client, u.nom, u.prenom ORDER BY montant_cumul DESC;";
+
+            MySqlDataReader reader0 = command1.ExecuteReader();
+            while (reader0.Read())
             {
-                Console.WriteLine(" Peuplement entreprise echec : " + e.ToString());
-                Console.ReadLine();
-                return;
+                try
+                {
+                    int idClient = Convert.ToInt32(reader0["id_client"]);
+                    string nom = reader0["nom"].ToString();
+                    string prenom = reader0["prenom"].ToString();
+                    decimal montantCumule = Convert.ToDecimal(reader0["montant_cumul"]);
+                    Console.WriteLine($"ID Client: {idClient}, Nom: {nom}, Prénom: {prenom}, Montant Cumulé: {montantCumule}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                }
             }
-            command.Dispose();
+            reader0.Close();
+            Console.WriteLine();
+
+
+            if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
+            {
+                maConnexion.Close();
+                Console.WriteLine("Connexion fermée.");
+            }
+
         }
 
         public void Affichage_cuisinier()
         {
+            try
+            {
+                string connexionString = "SERVER=localhost;PORT=3306;" +
+                                         "DATABASE=LivInParis;" +
+                                         "UID=root;PASSWORD=kakawete";
 
-
-
+                maConnexion = new MySqlConnection(connexionString);
+                maConnexion.Open();
+                Console.WriteLine("Connexion réussie.");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                // Gérer l'exception selon les besoins
+            }
             MySqlCommand command12 = maConnexion.CreateCommand();
             command12.CommandText = "SELECT DISTINCT u.id_utilisateur AS id_utilisateur, u.nom AS nom, u.prenom AS prenom, u.email AS email " +
                            "FROM commande c " +
@@ -448,8 +486,10 @@ namespace PSI
                 }
             }
 
-
             reader.Close();
+            Console.WriteLine();
+
+
 
             Console.WriteLine("depuis quand voulez-vous savoir les plats que le cuisinier a préparé ? sous le format AAAA-MM-JJ HH:MM:SS");
             DateTime date = Convert.ToDateTime(Console.ReadLine());
@@ -477,11 +517,37 @@ namespace PSI
                 }
             }
 
-
             reader1.Close();
+            Console.WriteLine();
 
 
+            Console.WriteLine("Plat par fréquence");
 
+            string query = "SELECT p.id_cuisinier,p.nom_plat,COUNT(*) AS dish_count,(COUNT(*) / total.total_count * 1.0) AS frequency_ratio FROM plat p " +
+                "JOIN ( SELECT id_cuisinier, COUNT(*) AS total_count FROM plat GROUP BY id_cuisinier) total ON p.id_cuisinier = total.id_cuisinier " +
+                "GROUP BY p.id_cuisinier, p.nom_plat, total.total_count ORDER BY p.id_cuisinier, frequency_ratio DESC;";
+
+            MySqlCommand command = new MySqlCommand(query, maConnexion);
+            MySqlDataReader reader4 = command.ExecuteReader();
+
+            while (reader4.Read())
+            {
+                try
+                {
+                    int idCuisinier = Convert.ToInt32(reader4["id_cuisinier"]);
+                    string nomPlat = reader4["nom_plat"].ToString();
+                    int dishCount = Convert.ToInt32(reader4["dish_count"]);
+                    decimal frequencyRatio = Convert.ToDecimal(reader4["frequency_ratio"]);
+
+                    // Affichage du ratio en pourcentage par exemple
+                    Console.WriteLine($"Cuisinier ID: {idCuisinier}, Plat: {nomPlat}, Effectif: {dishCount}, Fréquence: {frequencyRatio:P}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                }
+            }
+            reader4.Close();
 
 
             if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
@@ -491,9 +557,59 @@ namespace PSI
             }
         }
 
+        public void Interface_admin()
+        {
+            Console.WriteLine("Que voulez-vous faire ? (entrer le numero)");
+            Console.WriteLine("1.Modification de la base de donnée\n2.Affichage des données");
+            int num = Convert.ToInt32(Console.ReadLine());
+
+            try
+            {
+                string connexionString = "SERVER=localhost;PORT=3306;" +
+                                         "DATABASE=LivInParis;" +
+                                         "UID=root;PASSWORD=kakawete";
+
+                maConnexion = new MySqlConnection(connexionString);
+                maConnexion.Open();
+                Console.WriteLine("Connexion réussie.");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                // Gérer l'exception selon les besoins
+            }
+            switch (num)
+            {
+                case 1:
+                    Console.WriteLine("Entrer votre commande : ");
+                    string commande = Convert.ToString(Console.ReadLine());
+                    MySqlCommand command1 = maConnexion.CreateCommand();
+                    command1.CommandText = commande;
+                    command1.Dispose();
+
+                    break;
+                case 2:
+                    Console.WriteLine("1.Clients\n2.Cuisiniers\n3.Commandes");
+                    int choix = Convert.ToInt32(Console.ReadLine());
+                    switch (choix)
+                    {
+                        case 1:
+                            Affichage_client();
+                            break;
+                        case 2:
+                            Affichage_cuisinier();
+                            break;
+                        case 3:
+
+                            break;
+                    }
+
+                    break;
+
+            }
 
 
 
-
+        }
     }
 }
