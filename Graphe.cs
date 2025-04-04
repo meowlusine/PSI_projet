@@ -236,6 +236,39 @@ namespace PSI
 
                 return (distance, pred);
         }
+        
+        public void ObtenirTempsTrajet(int startId, int endId, int[,] distance, int[,] pred)
+        {
+            if (distance[startId, endId] == int.MaxValue)
+            {
+                Console.WriteLine("Aucun chemin trouvé entre les stations " + startId + " et " + endId);
+                return;
+            }
+
+            int totalTime = distance[startId, endId];
+            Console.WriteLine("Temps total du trajet : " + totalTime + " minutes");
+
+            // Reconstruction du chemin avec noms des stations
+            Stack<Noeud<T>> chemin = new Stack<Noeud<T>>();
+            Noeud<T> actuel = TrouverNoeudParId(endId);
+
+            while (actuel != null)
+            {
+                chemin.Push(actuel);
+                int predId = pred[startId, actuel.Id];
+                actuel = predId == -1 ? null : TrouverNoeudParId(predId);
+            }
+
+            // Affichage du chemin avec noms des stations
+            Console.Write("Chemin le plus court : ");
+            while (chemin.Count > 1)
+            {
+                var station = chemin.Pop();
+                Console.Write(station.Station.Nom_station + " (Ligne " + station.Station.Ligne + ") -> ");
+            }
+            var lastStation = chemin.Pop();
+            Console.WriteLine(lastStation.Station.Nom_station + " (Ligne " + lastStation.Station.Ligne + ")");
+        }
 
         public List<Noeud<T>> ReconstruireChemin(int startId, int endId, int[,] pred)
         {
