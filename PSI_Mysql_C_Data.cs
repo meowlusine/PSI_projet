@@ -39,7 +39,6 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
             }
 
             string Peuplement = " INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
@@ -370,7 +369,6 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
             }
 
 
@@ -463,7 +461,7 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
+            
             }
             MySqlCommand command12 = maConnexion.CreateCommand();
             
@@ -479,7 +477,6 @@ namespace PSI
                     continue;
                 }
 
-                // Vérifier que l'id appartient à un cuisinier enregistré
                 MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id", maConnexion);
                 cmdCheck.Parameters.AddWithValue("@id", id);
                 int count = Convert.ToInt32(cmdCheck.ExecuteScalar());
@@ -579,7 +576,6 @@ namespace PSI
                     int dishCount = Convert.ToInt32(reader4["dish_count"]);
                     decimal frequencyRatio = Convert.ToDecimal(reader4["frequency_ratio"]);
 
-                    // Affichage du ratio en pourcentage par exemple
                     Console.WriteLine($"Cuisinier ID: {idCuisinier}, Plat: {nomPlat}, Effectif: {dishCount}, Fréquence: {frequencyRatio:P}");
                 }
                 catch (Exception ex)
@@ -612,7 +608,6 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
             }
 
             Console.WriteLine(" le nombre de livraisons effectuées par cuisinier");
@@ -674,7 +669,6 @@ namespace PSI
 
             using (MySqlCommand cmdCommande = new MySqlCommand(requeteCommande, maConnexion))
             {
-                // Paramètres
                 cmdCommande.Parameters.Add("@date1", MySqlDbType.DateTime).Value = date1;
                 cmdCommande.Parameters.Add("@date2", MySqlDbType.DateTime).Value = date2;
 
@@ -745,7 +739,6 @@ namespace PSI
                     continue;
                 }
 
-                // Vérifier que l'id appartient à un cuisinier enregistré
                 MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM client WHERE id_client = @id", maConnexion);
                 cmdCheck.Parameters.AddWithValue("@id", id);
                 int count = Convert.ToInt32(cmdCheck.ExecuteScalar());
@@ -814,7 +807,6 @@ namespace PSI
 
             MySqlDataReader readerCommandes = cmdCommandesClient.ExecuteReader();
 
-            // Si aucune commande n'est trouvée, on affiche un message
             if (!readerCommandes.HasRows)
             {
                 Console.WriteLine("Aucune commande trouvée pour le client {0} avec des plats d'origine '{1}' entre {2} et {3}.",
@@ -872,13 +864,11 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
             }
 
             Console.WriteLine("Quel est le numéro de commande ? ");
             int numero = Convert.ToInt32(Console.ReadLine());
 
-            // Récupération du montant de la commande
             string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
                                   "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
 
@@ -887,7 +877,6 @@ namespace PSI
             object montant = command0.ExecuteScalar();
             Console.WriteLine($"Montant total : {montant} euros");
 
-            // Récupération de la station de métro du client
             string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
                                       "(SELECT id_utilisateur FROM client WHERE id_client = " +
                                       "(SELECT id_client FROM commande WHERE id_commande = @numero))";
@@ -898,7 +887,6 @@ namespace PSI
             Console.WriteLine($"Métro client : {metroClient}");
             string metro1 = metroClient.ToString();
 
-            // Récupération de la station de métro du cuisinier
             string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
                                          "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
                                          "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
@@ -1109,7 +1097,7 @@ namespace PSI
 
         public int AjouterUtilisateur()
         {
-            // Demande des informations à l'utilisateur
+
             Console.WriteLine("nom : ");
             string nom = Console.ReadLine();
             Console.WriteLine("prenom : ");
@@ -1131,7 +1119,7 @@ namespace PSI
             Console.WriteLine("metro le plus proche : ");
             string metro = Console.ReadLine();
 
-            int id_utilisateur = 0; // Valeur par défaut
+            int id_utilisateur = 0; 
             MySqlConnection maConnexion = null;
 
             try
@@ -1147,7 +1135,7 @@ namespace PSI
                 return id_utilisateur;
             }
 
-            // Préparation de la commande SQL avec des paramètres
+          
             string ajout = "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
                            "VALUES (@nom, @prenom, @mail, @mdp, @tel, @num_rue, @nom_rue, @codepostal, @ville, @metro)";
             MySqlCommand command = new MySqlCommand(ajout, maConnexion);
@@ -1165,7 +1153,6 @@ namespace PSI
             try
             {
                 command.ExecuteNonQuery();
-                // Récupération de l'id généré automatiquement
                 id_utilisateur = Convert.ToInt32(command.LastInsertedId);
                 Console.WriteLine("Insertion réussie, nouvel id_utilisateur : " + id_utilisateur);
             }
@@ -1202,7 +1189,6 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
             }
 
             string ajout = "INSERT INTO client (id_utilisateur, type_client)" + $"\r\nVALUES ({id_utilisateur}, '{type}')";
@@ -1231,7 +1217,6 @@ namespace PSI
             string res = Console.ReadLine();
             if (res == "y")
             {
-                //nom_entreprise, nom_referent, id_client)
                 Console.WriteLine("nom entreprise : ");
                 string nom_entreprise = Console.ReadLine();
                 Console.WriteLine("nom_referent : ");
@@ -1259,8 +1244,7 @@ namespace PSI
 
         public void AjouterCuisinier(int id_utilisateur)
         {
-            //INSERT INTO cuisinier (id_utilisateur, nb_etoile, avis_cuisinier)" +
-            // "\r\nVALUES (6, 3, 'Spécialiste en cuisine française'),"
+
 
            
 
@@ -1277,7 +1261,6 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
             }
 
             string ajout = "INSERT INTO cuisinier (id_utilisateur)" + $"\r\nVALUES ({id_utilisateur})";
