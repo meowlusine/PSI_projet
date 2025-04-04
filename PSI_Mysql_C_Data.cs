@@ -767,40 +767,66 @@ namespace PSI
 
             }
         }
-        public void Affichage_commande()
-        {
-            Console.WriteLine("Quel est le numéro de commande ? ");
-            int numero = Convert.ToInt32(Console.ReadLine());
+       public (string,string) Affichage_commande()
+{
+    try
+    {
+        string connexionString = "SERVER=localhost;PORT=3306;" +
+                                 "DATABASE=LivInParis;" +
+                                 "UID=root;PASSWORD=1234";
 
-            // Récupération du montant de la commande
-            string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
-                                  "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
+        maConnexion = new MySqlConnection(connexionString);
+        maConnexion.Open();
+        Console.WriteLine("Connexion réussie.");
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur de connexion : " + e.Message);
+        // Gérer l'exception selon les besoins
+    }
 
-            MySqlCommand command0 = new MySqlCommand(commande, maConnexion);
-            command0.Parameters.AddWithValue("@numero", numero);
-            object montant = command0.ExecuteScalar();
-            Console.WriteLine($"Montant total : {montant} €");
+    Console.WriteLine("Quel est le numéro de commande ? ");
+    int numero = Convert.ToInt32(Console.ReadLine());
 
-            // Récupération de la station de métro du client
-            string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
-                                      "(SELECT id_utilisateur FROM client WHERE id_client = " +
-                                      "(SELECT id_client FROM commande WHERE id_commande = @numero))";
+    // Récupération du montant de la commande
+    string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
+                          "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
 
-            MySqlCommand command1 = new MySqlCommand(queryMetroClient, maConnexion);
-            command1.Parameters.AddWithValue("@numero", numero);
-            object metroClient = command1.ExecuteScalar();
-            Console.WriteLine($"Métro client : {metroClient}");
+    MySqlCommand command0 = new MySqlCommand(commande, maConnexion);
+    command0.Parameters.AddWithValue("@numero", numero);
+    object montant = command0.ExecuteScalar();
+    Console.WriteLine($"Montant total : {montant} euros");
 
-            // Récupération de la station de métro du cuisinier
-            string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
-                                         "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
-                                         "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
+    // Récupération de la station de métro du client
+    string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
+                              "(SELECT id_utilisateur FROM client WHERE id_client = " +
+                              "(SELECT id_client FROM commande WHERE id_commande = @numero))";
 
-            MySqlCommand command2 = new MySqlCommand(queryMetroCuisinier, maConnexion);
-            command2.Parameters.AddWithValue("@numero", numero);
-            object metroCuisinier = command2.ExecuteScalar();
-            Console.WriteLine($"Métro cuisinier : {metroCuisinier}");
-        }
+    MySqlCommand command1 = new MySqlCommand(queryMetroClient, maConnexion);
+    command1.Parameters.AddWithValue("@numero", numero);
+    object metroClient = command1.ExecuteScalar();
+    Console.WriteLine($"Métro client : {metroClient}");
+    string metro1 = metroClient.ToString();
 
+    // Récupération de la station de métro du cuisinier
+    string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
+                                 "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
+                                 "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
+
+    MySqlCommand command2 = new MySqlCommand(queryMetroCuisinier, maConnexion);
+    command2.Parameters.AddWithValue("@numero", numero);
+    object metroCuisinier = command2.ExecuteScalar();
+    string metro2 = metroCuisinier.ToString();
+    Console.WriteLine($"Métro cuisinier : {metroCuisinier}");
+
+    if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
+    {
+        maConnexion.Close();
+        Console.WriteLine("Connexion fermée.");
+    }
+    Console.WriteLine();
+
+    return (metro1, metro2);
+}
     }
 }
