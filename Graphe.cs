@@ -32,22 +32,23 @@ namespace PSI
         /// Ajoute un lien de type Lien dans la liste d'adjacence et dans la matrice d'adjacence
         /// </summary>
         /// <param name="lien"></param>
-        public void AjouterLien(Lien lien)
-        {
-            Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
-            Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
+       public void AjouterLien(Lien lien)
+{
+    Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
+    Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
 
-            int stationIndex = noeuds.IndexOf(station);
-            int suivantIndex = noeuds.IndexOf(suivant);
+    int stationIndex = noeuds.IndexOf(station);
+    int suivantIndex = noeuds.IndexOf(suivant);
 
-            if (stationIndex >= 0 && stationIndex < noeuds.Count && suivantIndex >= 0 && suivantIndex < noeuds.Count)
-            {
-                this.liste_adjacence[station].Add(suivant);
-                this.matrice_adjacence[stationIndex, suivantIndex] = 1;
-                this.matrice_adjacence[suivantIndex, stationIndex] = 1;
-            }
-            
-        }
+    if (stationIndex >= 0 && stationIndex < noeuds.Count && suivantIndex >= 0 && suivantIndex < noeuds.Count)
+    {
+        this.liste_adjacence[station].Add(suivant);
+        this.matrice_adjacence[stationIndex, suivantIndex] = lien.Temps_entre_2_stations;
+        this.matrice_adjacence[suivantIndex, stationIndex] = lien.Temps_entre_2_stations;
+        this.matrice_adjacence[stationIndex, stationIndex] = 0;
+       
+    }
+}
 
         /// <summary>
         /// Permet d'afficher la liste d'adjacence
