@@ -19,13 +19,12 @@ namespace PSI
             this.noeuds = noeuds;
             this.liste_adjacence = new Dictionary<Noeud<T>, List<Noeud<T>>>();
 
-            // Initialisation de la liste d'adjacence pour chaque noeud
             foreach (var Noeud in noeuds)
             {
-                liste_adjacence[Noeud] = new List<Noeud<T>>();  // La clé est le Noeud<T>
+                liste_adjacence[Noeud] = new List<Noeud<T>>();  
             }
 
-            this.matrice_adjacence = new int[noeuds.Count, noeuds.Count];  // Création de la matrice d'adjacence
+            this.matrice_adjacence = new int[noeuds.Count, noeuds.Count];  
 
         }
 
@@ -38,7 +37,6 @@ namespace PSI
             Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
             Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
 
-            // Recherche de l'indice réel dans la liste
             int stationIndex = noeuds.IndexOf(station);
             int suivantIndex = noeuds.IndexOf(suivant);
 
@@ -51,7 +49,9 @@ namespace PSI
             
         }
 
-
+        /// <summary>
+        /// Permet d'afficher la liste d'adjacence
+        /// </summary>
         public void Afficher_liste_adj()
         {
             foreach (Noeud<T> noeud in this.liste_adjacence.Keys)
@@ -65,6 +65,9 @@ namespace PSI
             }
         }
 
+        /// <summary>
+        /// Permet d'afficher la matrice d'adjacence
+        /// </summary>
         public void Affichier_matrice_adj()
         {
             int taille = this.matrice_adjacence.GetLength(0);
@@ -111,7 +114,6 @@ namespace PSI
                 }
             }
 
-            // Affichage de l'ordre des nœuds visités
             Console.WriteLine("Ordre des noeuds visités : ");
             foreach (Noeud<T> noeud in ordreVisites)
             {
@@ -163,6 +165,11 @@ namespace PSI
         #endregion BFS et DFS
 
         #region Connexité
+
+        /// <summary>
+        /// Permet de savoir si un graphe est connexe ou non
+        /// </summary>
+        /// <returns></returns>
         public bool EstConnexe()
         {
             bool[] visite = this.DFS(this.noeuds[0]); // On commence le DFS depuis le premier nœud
@@ -171,6 +178,11 @@ namespace PSI
         #endregion Connexité
 
 
+        /// <summary>
+        /// Fonction FLoydWarshall
+        /// </summary>
+        /// <param name="liens"></param>
+        /// <returns></returns>
         #region FloydWarshall
         public (int[,], int[,]) FloydWarshall(List<Lien>liens)
         {
