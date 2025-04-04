@@ -10,6 +10,9 @@ namespace PSI
     {
         static void Main(string[] args)
         {
+            PSI_Mysql_C_Data maConnexion = new PSI_Mysql_C_Data();
+
+
             string fichier_station = "MetroParis - Noeuds.csv";
             string fichier_arc = "MetroParis - Arcs.csv";
             string[,] matrice_station = Transformation_Matrice(fichier_station);
@@ -44,20 +47,7 @@ namespace PSI
                 return matrice;
             }
 
-
-
-            //Console.WriteLine("Première ligne (ID Station, Libelle Line, etc.):");
-            //for (int i = 1; i < matrice_station.GetLength(1); i++)
-            //{
-            //Console.Write(matrice_station[0, i] + " | ");
-            //}
-            //Console.WriteLine();
-
-            //Console.WriteLine("\nDétails pour la station 2:");
-            //Console.WriteLine("ID Station: " + matrice_station[2, 0]);  // Devrait afficher "2"
-            //Console.WriteLine("Libelle station: " + matrice_station[2, 2]);  // Devrait afficher "Argentine"
-            //Console.WriteLine("Longitude: " + matrice_station[2, 3]);  // Devrait afficher "2.2894"
-            //Console.WriteLine("Latitude: " + matrice_station[2, 4]);  // Devrait afficher "48.8756"  
+ 
 
 
 
@@ -79,7 +69,6 @@ namespace PSI
             }
 
             // ajout de noeud
-
             List<Noeud<Station>> noeuds_temp = new List<Noeud<Station>>();
             for (int i = 0; i < stations.Count; i++)
             {
@@ -99,10 +88,8 @@ namespace PSI
 
             }
 
+
             // Ajout liens
-
-
-
             // Déclaration de la liste d'exceptions pour les stations de la 7bis
             List<string> exceptions = new List<string> { "place des fetes", "pres saint gervais", "danube" };
 
@@ -190,8 +177,6 @@ namespace PSI
             }
 
 
-
-
             //Creation graphe 
             Graphe<Station> graphe = new Graphe<Station>(noeuds_temp );
 
@@ -201,36 +186,23 @@ namespace PSI
                 graphe.AjouterLien(lien);
             }
 
-            // Affiche la liste d'adjacence
-            //.Afficher_liste_adj();
 
-            //Affichage de la matrice d'adjacence
-            //Console.WriteLine("Matrice d'adjacence :");
-            //graphe.Affichier_matrice_adj();
+            int startId = 0; 
+            int endId = 50; 
 
-           GraphVisualizer visualizer = new GraphVisualizer(graphe);
-           
-           visualizer.GenererImage("graphe.png");
-            visualizer.AfficherImage("graphe.png");
+            var (distance, pred) = graphe.FloydWarshall(liens);
+            List<Noeud<Station>> chemin = graphe.ReconstruireChemin(startId, endId, pred);
 
-            //// Test DFS
-            //Console.WriteLine("\nTest DFS depuis Station 1 :");
-            //graphe.DFS(noeuds[0]);
-
-            //// Test BFS
-            //Console.WriteLine("\nTest BFS depuis Station 1 :");
-            //graphe.BFS(noeuds[0]);
-
-            //// Vérification si le graphe est connexe
-            //Console.WriteLine("\nLe graphe est-il connexe ? " + graphe.EstConnexe());
+            // Affichage du chemin
+            Console.WriteLine("Chemin le plus court entre les stations:");
+            foreach (var noeud in chemin)
+            {
+                Console.WriteLine(noeud.Station.Nom_station); // Afficher le nom de la station
+            }
 
 
-            //// Pause pour voir le résultat dans une application console classique
-            //Console.WriteLine("\nAppuyez sur une touche pour fermer...");
-            //Console.ReadKey();
 
-            // test dijkstra 
-             (Noeud<Station>[] chemin, int temps ) = algos_chemin.dijkstra(graphe, noeuds_temp[0], noeuds_temp[20]);
+            (Noeud<Station>[] chemin_pcc, int temps ) = algos_chemin.dijkstra(graphe, noeuds_temp[0], noeuds_temp[20]);
              Console.WriteLine("le chemin entre " + noeuds_temp[0].Station.Nom_station + " et " + noeuds_temp[20].Station.Nom_station + " est ");
              foreach(Noeud<Station> station in chemin)
             {
@@ -240,37 +212,36 @@ namespace PSI
 
 
 
+             //(Noeud<Station>[] noeuds_djikstra, int temps)=algos_chemin.dijkstra(graphe, noeuds_temp[0], noeuds_temp[80]);
+             //List<Noeud<Station>> stations_djikstra= algos_chemin.CreationListeNoeuds(noeuds_djikstra);
+             //Graphe<Station> grapheChemin_Djikstra = Graphe<Station>.CreerGrapheDuChemin(stations_djikstra, liens);
+             //GraphVisualizer visualizer = new GraphVisualizer(grapheChemin_Djikstra);
+             //visualizer.GenererImage("graphe.png");
+             //visualizer.AfficherImage("graphe.png");
+
+
+            //AffichageConsole.AfficherConsole();
+
+           //List<Noeud<Station>> cheminPlusCourt = graphe.BellmanFord(noeuds_temp[0], noeuds_temp[23], liens);
+           //Graphe<Station> grapheChemin = Graphe<Station>.CreerGrapheDuChemin(cheminPlusCourt, liens);
+           //GraphVisualizer visualizer_BF = new GraphVisualizer(grapheChemin);
+           //visualizer_BF.GenererImage("graphe2.png");
+            //visualizer_BF.AfficherImage("graphe2.png");
+
+
+           ///GraphVisualizer visualizer = new GraphVisualizer(graphe);
+           //visualizer.GenererImage("graphe.png");
+            //visualizer.AfficherImage("graphe.png");
 
 
 
-
-            // test lien 
-            Console.WriteLine("\nListe des liens créés :");
-            foreach (Lien lien in liens)
-            {
-                Console.WriteLine(lien.ToString());
-            }
-            Console.WriteLine(liens.Count());
-            Console.WriteLine(noeuds_temp.Count());
+            //// Vérification si le graphe est connexe
+            //Console.WriteLine("\nLe graphe est-il connexe ? " + graphe.EstConnexe());
 
 
-            //TEST STATIONS
-            //foreach (var station in stations)
-            //{
-            //Console.WriteLine($"Station : {station.Nom_station}, Ligne : {station.Ligne}, " +
-            //$"Commune : {station.Commune_nom} ({station.Commune_code}), " +
-            //$"Coordonnées : {station.Longitude}, {station.Latitude}");
-            //}
-
-
-            //TEST NOEUDS
-            //Console.WriteLine("Liste des Noeuds :");
-            //foreach (var noeud in noeuds)
-            //{
-            //Affiche chaque noeud avec son contenu (via ToString)
-            //Console.WriteLine(noeud.ToString());
-            //}
-
+            //// Pause pour voir le résultat dans une application console classique
+            //Console.WriteLine("\nAppuyez sur une touche pour fermer...");
+            //Console.ReadKey();
 
         }
     }
