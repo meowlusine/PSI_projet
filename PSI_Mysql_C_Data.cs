@@ -1107,9 +1107,9 @@ namespace PSI
             }
         }
 
-        public void AjouterUtilisateur()
+        public int AjouterUtilisateur()
         {
-            //nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro
+            // Demande des informations à l'utilisateur
             Console.WriteLine("nom : ");
             string nom = Console.ReadLine();
             Console.WriteLine("prenom : ");
@@ -1131,12 +1131,12 @@ namespace PSI
             Console.WriteLine("metro le plus proche : ");
             string metro = Console.ReadLine();
 
+            int id_utilisateur = 0; // Valeur par défaut
+            MySqlConnection maConnexion = null;
+
             try
             {
-                string connexionString = "SERVER=localhost;PORT=3306;" +
-                                         "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
-
+                string connexionString = "SERVER=localhost;PORT=3306;DATABASE=LivInParis;UID=root;PASSWORD=kakawete";
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
                 Console.WriteLine("Connexion réussie.");
@@ -1144,28 +1144,46 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
+                return id_utilisateur;
             }
 
-            string ajout = " INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
-                $"\r\nVALUES ('{nom}', '{prenom}', '{mail}', '{mdp}', '{tel}', {num_rue}, '{nom_rue}', {codepostal}, '{ville}', '{metro}')";
-            MySqlCommand command = maConnexion.CreateCommand();
-            command.CommandText = ajout;
+            // Préparation de la commande SQL avec des paramètres
+            string ajout = "INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
+                           "VALUES (@nom, @prenom, @mail, @mdp, @tel, @num_rue, @nom_rue, @codepostal, @ville, @metro)";
+            MySqlCommand command = new MySqlCommand(ajout, maConnexion);
+            command.Parameters.AddWithValue("@nom", nom);
+            command.Parameters.AddWithValue("@prenom", prenom);
+            command.Parameters.AddWithValue("@mail", mail);
+            command.Parameters.AddWithValue("@mdp", mdp);
+            command.Parameters.AddWithValue("@tel", tel);
+            command.Parameters.AddWithValue("@num_rue", num_rue);
+            command.Parameters.AddWithValue("@nom_rue", nom_rue);
+            command.Parameters.AddWithValue("@codepostal", codepostal);
+            command.Parameters.AddWithValue("@ville", ville);
+            command.Parameters.AddWithValue("@metro", metro);
+
             try
             {
                 command.ExecuteNonQuery();
-                Console.WriteLine("reussi");
-
+                // Récupération de l'id généré automatiquement
+                id_utilisateur = Convert.ToInt32(command.LastInsertedId);
+                Console.WriteLine("Insertion réussie, nouvel id_utilisateur : " + id_utilisateur);
             }
             catch (MySqlException e)
             {
-                Console.WriteLine("echec : " + e.ToString());
-                Console.ReadLine();
-                return;
+                Console.WriteLine("Echec : " + e.ToString());
             }
-            command.Dispose();
-
+            finally
+            {
+                command.Dispose();
+                if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
+                {
+                    maConnexion.Close();
+                }
+            }
+            return id_utilisateur;
         }
+
 
         public void AjouterClient(int id_utilisateur)
         {
@@ -1175,7 +1193,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=1234";
+                                         "UID=root;PASSWORD=kakawete";
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -1200,7 +1218,7 @@ namespace PSI
             {
                 Console.WriteLine("echec : " + e.ToString());
                 Console.ReadLine();
-                return;
+                
             }
 
             string recupIdClient = "SELECT id_client FROM client WHERE id_utilisateur =@id_utilisateur ";
@@ -1232,7 +1250,7 @@ namespace PSI
                 {
                     Console.WriteLine("echec : " + e.ToString());
                     Console.ReadLine();
-                    return;
+                    
                 }
             }
             command.Dispose();
@@ -1244,14 +1262,13 @@ namespace PSI
             //INSERT INTO cuisinier (id_utilisateur, nb_etoile, avis_cuisinier)" +
             // "\r\nVALUES (6, 3, 'Spécialiste en cuisine française'),"
 
-            Console.WriteLine("nombre d'etoile : ");
-            int nb_etoile = Convert.ToInt32(Console.ReadLine());
+           
 
             try
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=1234";
+                                         "UID=root;PASSWORD=kakawete";
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -1263,7 +1280,7 @@ namespace PSI
                 // Gérer l'exception selon les besoins
             }
 
-            string ajout = "INSERT INTO cuisinier (id_utilisateur, nb_etoile)" + $"\r\nVALUES ({id_utilisateur}, {nb_etoile})";
+            string ajout = "INSERT INTO cuisinier (id_utilisateur)" + $"\r\nVALUES ({id_utilisateur})";
             MySqlCommand command = maConnexion.CreateCommand();
             command.CommandText = ajout;
             try
@@ -1276,7 +1293,7 @@ namespace PSI
             {
                 Console.WriteLine("echec : " + e.ToString());
                 Console.ReadLine();
-                return;
+                
             }
             command.Dispose();
 
