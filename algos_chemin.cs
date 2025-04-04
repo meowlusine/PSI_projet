@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PSI
 {
-    internal class algos_chemin
+    public class algos_chemin
     {
        /// <summary>
        /// Fonction Djikstra, permet de trouver le PCC d'un noeud de depart à un noeud d'arrivé
