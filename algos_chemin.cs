@@ -8,7 +8,13 @@ namespace PSI
 {
     internal class algos_chemin
     {
-       
+       /// <summary>
+       /// Fonction Djikstra, permet de trouver le PCC d'un noeud de depart à un noeud d'arrivé
+       /// </summary>
+       /// <param name="graphe"></param>
+       /// <param name="depart"></param>
+       /// <param name="arrivee"></param>
+       /// <returns></returns>
         public static (Noeud<Station>[],int) dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
        {
            System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
@@ -88,6 +94,11 @@ namespace PSI
            return (chemin.ToArray(),temps); 
        }
 
+       /// <summary>
+       /// Permet de transformer un tableau de noeud en List<Noeud<Station>>, pour ensuite, à partir de cette liste, construire le graphe du PCC
+       /// </summary>
+       /// <param name="tab"></param>
+       /// <returns></returns>
         public static List<Noeud<Station>> CreationListeNoeuds( Noeud<Station>[] tab)
         {
             if(tab == null || tab.Length == 0){
