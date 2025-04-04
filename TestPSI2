@@ -1,6 +1,0 @@
-<script>start("/Users/Tashaly/RiderProjects/testn1/TestPSI2/");</script>
-<script>onHasParentDirectory();</script>
-<script>addRow("bin","bin",1,96,"96 B",1743768132,"04/04/2025, 14:02:12");</script>
-<script>addRow("obj","obj",1,352,"352 B",1743768674,"04/04/2025, 14:11:14");</script>
-<script>addRow("TestPSI2.csproj","TestPSI2.csproj",0,866,"866 B",1743768674,"04/04/2025, 14:11:14");</script>
-<script>addRow("UnitTest1.cs","UnitTest1.cs",0,5141,"5.0 kB",1743775671,"04/04/2025, 16:07:51");</script>
