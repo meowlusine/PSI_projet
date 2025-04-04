@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Mysqlx.Prepare;
 using MySqlX.XDevAPI;
 using Org.BouncyCastle.Tls.Crypto;
 using SkiaSharp;
@@ -6,10 +7,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
+using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
 
 namespace PSI
 {
@@ -30,7 +34,7 @@ namespace PSI
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
-                Console.WriteLine("Connexion réussie.");
+
             }
             catch (MySqlException e)
             {
@@ -81,7 +85,7 @@ namespace PSI
             try
             {
                 command.ExecuteNonQuery();
-                Console.WriteLine("Peuplement reussi");
+
 
             }
             catch (MySqlException e)
@@ -106,7 +110,7 @@ namespace PSI
             try
             {
                 command3.ExecuteNonQuery();
-                Console.WriteLine("Peuplement cuisiniers reussi");
+
 
             }
             catch (MySqlException e)
@@ -145,7 +149,7 @@ namespace PSI
             try
             {
                 command2.ExecuteNonQuery();
-                Console.WriteLine("Peuplement plats reussi");
+
 
             }
             catch (MySqlException e)
@@ -170,7 +174,7 @@ namespace PSI
             try
             {
                 command4.ExecuteNonQuery();
-                Console.WriteLine("Peuplement clients reussi");
+
 
             }
             catch (MySqlException e)
@@ -195,7 +199,7 @@ namespace PSI
             try
             {
                 command5.ExecuteNonQuery();
-                Console.WriteLine("Peuplement entreprise reussi");
+
 
             }
             catch (MySqlException e)
@@ -230,7 +234,7 @@ namespace PSI
             try
             {
                 command6.ExecuteNonQuery();
-                Console.WriteLine("Peuplement recette reussi");
+
 
             }
             catch (MySqlException e)
@@ -248,7 +252,7 @@ namespace PSI
             try
             {
                 command7.ExecuteNonQuery();
-                Console.WriteLine("Peuplement commande reussi");
+
 
             }
             catch (MySqlException e)
@@ -276,7 +280,7 @@ namespace PSI
             try
             {
                 command8.ExecuteNonQuery();
-                Console.WriteLine("Peuplement transaction reussi");
+
 
             }
             catch (MySqlException e)
@@ -297,7 +301,6 @@ namespace PSI
             try
             {
                 command9.ExecuteNonQuery();
-                Console.WriteLine("Peuplement livraison reussi");
 
             }
             catch (MySqlException e)
@@ -318,7 +321,7 @@ namespace PSI
             try
             {
                 command10.ExecuteNonQuery();
-                Console.WriteLine("Peuplement transaction_commande reussi");
+
 
             }
             catch (MySqlException e)
@@ -339,7 +342,7 @@ namespace PSI
             try
             {
                 command11.ExecuteNonQuery();
-                Console.WriteLine("Peuplement livraison_commande reussi");
+
 
             }
             catch (MySqlException e)
@@ -362,7 +365,7 @@ namespace PSI
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
-                Console.WriteLine("Connexion réussie.");
+
             }
             catch (MySqlException e)
             {
@@ -440,7 +443,7 @@ namespace PSI
             if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
             {
                 maConnexion.Close();
-                Console.WriteLine("Connexion fermée.");
+
             }
 
         }
@@ -455,7 +458,7 @@ namespace PSI
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
-                Console.WriteLine("Connexion réussie.");
+
             }
             catch (MySqlException e)
             {
@@ -463,14 +466,39 @@ namespace PSI
                 // Gérer l'exception selon les besoins
             }
             MySqlCommand command12 = maConnexion.CreateCommand();
-            Console.WriteLine("Donnez l'id du cuisisnier");
-            int id = Convert.ToInt32(Console.ReadLine());
+            
+         
+            int id;
+            while (true)
+            {
+                Console.WriteLine("Donnez l'id du cuisinier :");
+                string identree = Console.ReadLine();
+                if (!int.TryParse(identree, out id))
+                {
+                    Console.WriteLine("Erreur : l'id doit être un entier. Veuillez réessayer.");
+                    continue;
+                }
+
+                // Vérifier que l'id appartient à un cuisinier enregistré
+                MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id", maConnexion);
+                cmdCheck.Parameters.AddWithValue("@id", id);
+                int count = Convert.ToInt32(cmdCheck.ExecuteScalar());
+                if (count == 0)
+                {
+                    Console.WriteLine("Il n'y a pas de cuisiniers enregistrés sous cet id. Veuillez réessayer.");
+                    continue;
+                }
+                break;
+            }
+
+
+
             command12.CommandText = "SELECT DISTINCT u.id_utilisateur AS id_utilisateur, u.nom AS nom, u.prenom AS prenom, u.email AS email " +
                            "FROM commande c " +
                            "JOIN client cl ON c.id_client = cl.id_client " +
                            "JOIN utilisateur u ON cl.id_utilisateur = u.id_utilisateur " +
-                           "WHERE c.id_cuisinier = "+id;
-            Console.WriteLine("les clients que le cuisinier "+id+" a pu servir depuis son inscription à la plateforme");
+                           "WHERE c.id_cuisinier = " + id;
+            Console.WriteLine("les clients que le cuisinier " + id + " a pu servir depuis son inscription à la plateforme");
             MySqlDataReader reader = command12.ExecuteReader();
             while (reader.Read())
             {
@@ -492,14 +520,24 @@ namespace PSI
             Console.WriteLine();
 
 
+            DateTime date;
+            while (true)
+            {
+                Console.WriteLine("Depuis quand voulez - vous savoir les plats que le cuisinier a préparé ? sous le format AAAA - MM - JJ HH: MM:SS");
+                string entree= Console.ReadLine();
+                if (DateTime.TryParseExact(entree, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+                {
+                    break;
+                }
+                Console.WriteLine("Erreur: le format de la date n'est pas correct. Veuillez respecter le format AAAA-MM-JJ HH:MM:SS.");
+            }
 
-            Console.WriteLine("depuis quand voulez-vous savoir les plats que le cuisinier a préparé ? sous le format AAAA-MM-JJ HH:MM:SS");
-            DateTime date = Convert.ToDateTime(Console.ReadLine());
-            Console.WriteLine("les clients que le cuisinier "+id+" a pu servir depuis le " + Convert.ToString(date));
+
+            Console.WriteLine("les clients que le cuisinier " + id + " a pu servir depuis le " + Convert.ToString(date));
             MySqlCommand command13 = maConnexion.CreateCommand();
             command13.CommandText = "SELECT DISTINCT u.id_utilisateur, u.nom, u.prenom, u.email " +
                 "FROM commande c JOIN client cl ON c.id_client = cl.id_client JOIN utilisateur u" +
-                " ON cl.id_utilisateur = u.id_utilisateur WHERE c.id_cuisinier =  " +id+
+                " ON cl.id_utilisateur = u.id_utilisateur WHERE c.id_cuisinier =  " + id +
                 " AND c.date_commande BETWEEN '" + date + "' AND CURDATE(); ";
 
             MySqlDataReader reader1 = command13.ExecuteReader();
@@ -555,7 +593,7 @@ namespace PSI
             if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
             {
                 maConnexion.Close();
-                Console.WriteLine("Connexion fermée.");
+
             }
         }
 
@@ -577,129 +615,231 @@ namespace PSI
                 // Gérer l'exception selon les besoins
             }
 
-            //Console.WriteLine(" le nombre de livraisons effectuées par cuisinier");
-            //string requete = "SELECT id_cuisinier, COUNT(*) AS nb_livraisons FROM livraison GROUP BY id_cuisinier;";
+            Console.WriteLine(" le nombre de livraisons effectuées par cuisinier");
+            string requete = "SELECT id_cuisinier, COUNT(*) AS nb_livraisons FROM livraison GROUP BY id_cuisinier;";
 
-            //MySqlCommand cmdLivraison = new MySqlCommand(requete, maConnexion);
-            //MySqlDataReader readerLivraison = cmdLivraison.ExecuteReader();
+            MySqlCommand cmdLivraison = new MySqlCommand(requete, maConnexion);
+            MySqlDataReader readerLivraison = cmdLivraison.ExecuteReader();
 
-            //while (readerLivraison.Read())
-            //{
-            //    try
-            //    {
-            //        int idCuisinier = Convert.ToInt32(readerLivraison["id_cuisinier"]);
-            //        int nbLivraisons = Convert.ToInt32(readerLivraison["nb_livraisons"]);
-            //        Console.WriteLine($"Cuisinier {idCuisinier} a effectué {nbLivraisons} livraisons.");
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
-            //    }
-            //}
-            //readerLivraison.Close();
-
-            //Console.WriteLine();
-
-
-            //Console.WriteLine(" les commandes selon une période de temps");
-            //Console.WriteLine("La premiere date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
-            //DateTime date1 = Convert.ToDateTime(Console.ReadLine());
-
-            //Console.WriteLine("La deuxieme date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
-            //DateTime date2 = Convert.ToDateTime(Console.ReadLine());
-
-            //string requeteCommande = @" SELECT * FROM commande WHERE date_commande BETWEEN @date1 AND @date2 ORDER BY date_commande;";
-
-            //using (MySqlCommand cmdCommande = new MySqlCommand(requeteCommande, maConnexion))
-            //{
-            //    // Paramètres
-            //    cmdCommande.Parameters.Add("@date1", MySqlDbType.DateTime).Value = date1;
-            //    cmdCommande.Parameters.Add("@date2", MySqlDbType.DateTime).Value = date2;
-
-            //    using (MySqlDataReader readerCommande = cmdCommande.ExecuteReader())
-            //    {
-            //        while (readerCommande.Read())
-            //        {
-            //            try
-            //            {
-            //                int idCommande = Convert.ToInt32(readerCommande["id_commande"]);
-            //                int idCuisinier = Convert.ToInt32(readerCommande["id_cuisinier"]);
-            //                int idClient = Convert.ToInt32(readerCommande["id_client"]);
-            //                DateTime dateCommande = Convert.ToDateTime(readerCommande["date_commande"]);
-
-            //                Console.WriteLine($"Commande {idCommande}: Cuisinier {idCuisinier}, Client {idClient}, Date {dateCommande}");
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
-            //            }
-            //        }
-            //    }
-            //}
-
-            //Console.WriteLine();
-
-
-
-            //string requeteMoyennePrix = " SELECT AVG(t.montant_total) AS moyenne_prix FROM commande c JOIN transaction_commande tc ON c.id_commande = tc.id_commande JOIN `transaction` t ON tc.id_transaction = t.id_transaction;";
-
-            //using (MySqlCommand cmdMoyennePrix = new MySqlCommand(requeteMoyennePrix, maConnexion))
-            //{
-            //    object resultPrix = cmdMoyennePrix.ExecuteScalar();
-            //    if (resultPrix != null && resultPrix != DBNull.Value)
-            //    {
-            //        decimal moyennePrix = Convert.ToDecimal(resultPrix);
-            //        Console.WriteLine($"La moyenne des prix des commandes est : {moyennePrix}");
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("Aucune donnée disponible pour calculer la moyenne.");
-            //    }
-            //}
-            //Console.WriteLine();
-
-            //Console.WriteLine("moyenne des comptes clients :");
-            //string queryMoyenneCommandes = @"SELECT AVG(nb_commandes) AS moyenne_commandes FROM (SELECT id_client, COUNT(*) AS nb_commandes FROM commande GROUP BY id_client) AS sub;";
-
-            //MySqlCommand cmdMoyenneCommandes = new MySqlCommand(queryMoyenneCommandes, maConnexion);
-            //object resultMoyenne = cmdMoyenneCommandes.ExecuteScalar();
-            //if (resultMoyenne != null)
-            //{
-            //    decimal moyenneCommandes = Convert.ToDecimal(resultMoyenne);
-            //    Console.WriteLine($"La moyenne des commandes par client est : {moyenneCommandes}");
-            //}
-            //Console.WriteLine();
-
-
-            int clientId = 6; // Par exemple, à remplacer par l'ID du client recherché
-            string origineRecherche = "Française"; // Modifier selon la nationalité recherchée
-
-            string queryCommandesClient = "SELECT DISTINCT c.id_commande, c.date_commande, cl.id_client, u.nom AS nom_client, u.prenom AS prenom_client, p.origine FROM commande c " +
-                " JOIN client cl ON c.id_client = cl.id_client JOIN utilisateur u ON cl.id_utilisateur = u.id_utilisateur JOIN plat p ON c.id_cuisinier = p.id_cuisinier " +
-                "WHERE cl.id_client = @clientId AND c.date_commande BETWEEN '2020-01-01' AND '2024-12-31' AND p.origine = @origineRecherche ORDER BY c.date_commande;";
-
-            MySqlCommand cmdCommandesClient = new MySqlCommand(queryCommandesClient, maConnexion);
-            cmdCommandesClient.Parameters.AddWithValue("@clientId", clientId);
-            cmdCommandesClient.Parameters.AddWithValue("@origineRecherche", origineRecherche);
-
-            MySqlDataReader readerCommandes = cmdCommandesClient.ExecuteReader();
-
-            while (readerCommandes.Read())
+            while (readerLivraison.Read())
             {
                 try
                 {
-                    int idCommande = Convert.ToInt32(readerCommandes["id_commande"]);
-                    DateTime dateCommande = Convert.ToDateTime(readerCommandes["date_commande"]);
-                    int idClient = Convert.ToInt32(readerCommandes["id_client"]);
-                    string nomClient = readerCommandes["nom_client"].ToString();
-                    string prenomClient = readerCommandes["prenom_client"].ToString();
-                    string origine = readerCommandes["origine"].ToString();
-
-                    Console.WriteLine($"Commande {idCommande} pour le client {nomClient} {prenomClient} (ID: {idClient}) le {dateCommande:d}, Plat d'origine: {origine}");
+                    int idCuisinier = Convert.ToInt32(readerLivraison["id_cuisinier"]);
+                    int nbLivraisons = Convert.ToInt32(readerLivraison["nb_livraisons"]);
+                    Console.WriteLine($"Cuisinier {idCuisinier} a effectué {nbLivraisons} livraisons.");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                }
+            }
+            readerLivraison.Close();
+
+            Console.WriteLine();
+
+
+            Console.WriteLine(" les commandes selon une période de temps");
+
+
+
+
+            DateTime date1;
+            while (true)
+            {
+                Console.WriteLine("La premiere date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
+                string entree = Console.ReadLine();
+                if (DateTime.TryParseExact(entree, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date1))
+                {
+                    break;
+                }
+                Console.WriteLine("Erreur: le format de la date n'est pas correct. Veuillez respecter le format AAAA-MM-JJ HH:MM:SS.");
+            }
+
+            DateTime date2;
+            while (true)
+            {
+                Console.WriteLine("La deuxieme date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
+                string entree = Console.ReadLine();
+                if (DateTime.TryParseExact(entree, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date2))
+                {
+                    break;
+                }
+                Console.WriteLine("Erreur: le format de la date n'est pas correct. Veuillez respecter le format AAAA-MM-JJ HH:MM:SS.");
+            }
+
+
+
+            string requeteCommande = @" SELECT * FROM commande WHERE date_commande BETWEEN @date1 AND @date2 ORDER BY date_commande;";
+
+            using (MySqlCommand cmdCommande = new MySqlCommand(requeteCommande, maConnexion))
+            {
+                // Paramètres
+                cmdCommande.Parameters.Add("@date1", MySqlDbType.DateTime).Value = date1;
+                cmdCommande.Parameters.Add("@date2", MySqlDbType.DateTime).Value = date2;
+
+                using (MySqlDataReader readerCommande = cmdCommande.ExecuteReader())
+                {
+                    while (readerCommande.Read())
+                    {
+                        try
+                        {
+                            int idCommande = Convert.ToInt32(readerCommande["id_commande"]);
+                            int idCuisinier = Convert.ToInt32(readerCommande["id_cuisinier"]);
+                            int idClient = Convert.ToInt32(readerCommande["id_client"]);
+                            DateTime dateCommande = Convert.ToDateTime(readerCommande["date_commande"]);
+
+                            Console.WriteLine($"Commande {idCommande}: Cuisinier {idCuisinier}, Client {idClient}, Date {dateCommande}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine();
+
+
+
+            string requeteMoyennePrix = " SELECT AVG(t.montant_total) AS moyenne_prix FROM commande c JOIN transaction_commande tc ON c.id_commande = tc.id_commande JOIN `transaction` t ON tc.id_transaction = t.id_transaction;";
+
+            using (MySqlCommand cmdMoyennePrix = new MySqlCommand(requeteMoyennePrix, maConnexion))
+            {
+                object resultPrix = cmdMoyennePrix.ExecuteScalar();
+                if (resultPrix != null && resultPrix != DBNull.Value)
+                {
+                    decimal moyennePrix = Convert.ToDecimal(resultPrix);
+                    Console.WriteLine($"La moyenne des prix des commandes est : {moyennePrix}");
+                }
+                else
+                {
+                    Console.WriteLine("Aucune donnée disponible pour calculer la moyenne.");
+                }
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("moyenne des comptes clients :");
+            string queryMoyenneCommandes = @"SELECT AVG(nb_commandes) AS moyenne_commandes FROM (SELECT id_client, COUNT(*) AS nb_commandes FROM commande GROUP BY id_client) AS sub;";
+
+            MySqlCommand cmdMoyenneCommandes = new MySqlCommand(queryMoyenneCommandes, maConnexion);
+            object resultMoyenne = cmdMoyenneCommandes.ExecuteScalar();
+            if (resultMoyenne != null)
+            {
+                decimal moyenneCommandes = Convert.ToDecimal(resultMoyenne);
+                Console.WriteLine($"La moyenne des commandes par client est : {moyenneCommandes}");
+            }
+            Console.WriteLine();
+
+
+            Console.WriteLine(" liste des commandes pour un client selon la nationalité des plats, la période ");
+            int id;
+            while (true)
+            {
+                Console.WriteLine("Donnez l'id du client :");
+                string identree = Console.ReadLine();
+                if (!int.TryParse(identree, out id))
+                {
+                    Console.WriteLine("Erreur : l'id doit être un entier. Veuillez réessayer.");
+                    continue;
+                }
+
+                // Vérifier que l'id appartient à un cuisinier enregistré
+                MySqlCommand cmdCheck = new MySqlCommand("SELECT COUNT(*) FROM client WHERE id_client = @id", maConnexion);
+                cmdCheck.Parameters.AddWithValue("@id", id);
+                int count = Convert.ToInt32(cmdCheck.ExecuteScalar());
+                if (count == 0)
+                {
+                    Console.WriteLine("Il n'y a pas de client enregistrés sous cet id. Veuillez réessayer.");
+                    continue;
+                }
+                break;
+            }
+
+
+            DateTime date3;
+            while (true)
+            {
+                Console.WriteLine("La premiere date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
+                string entree = Console.ReadLine();
+                if (DateTime.TryParseExact(entree, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date3))
+                {
+                    break;
+                }
+                Console.WriteLine("Erreur: le format de la date n'est pas correct. Veuillez respecter le format AAAA-MM-JJ HH:MM:SS.");
+            }
+
+            DateTime date4;
+            while (true)
+            {
+                Console.WriteLine("La deuxieme date de la periode ? sous le format AAAA-MM-JJ HH:MM:SS");
+                string entree = Console.ReadLine();
+                if (DateTime.TryParseExact(entree, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out date4))
+                {
+                    break;
+                }
+                Console.WriteLine("Erreur: le format de la date n'est pas correct. Veuillez respecter le format AAAA-MM-JJ HH:MM:SS.");
+            }
+
+
+            string nationalite;
+            while (true)
+            {
+                Console.WriteLine("Veuillez entrer la nationalité du plat que vous demandez :");
+                nationalite = Console.ReadLine().Trim();
+                if (!string.IsNullOrEmpty(nationalite))
+                {
+                    break;
+                }
+                Console.WriteLine("Erreur : la nationalité ne peut pas être vide. Veuillez réessayer.");
+            }
+
+            string queryCommandesClient = @"SELECT DISTINCT c.id_commande, c.date_commande, cl.id_client, 
+                                                   u.nom AS nom_client, u.prenom AS prenom_client, p.origine 
+                                            FROM commande c
+                                            JOIN client cl ON c.id_client = cl.id_client 
+                                            JOIN utilisateur u ON cl.id_utilisateur = u.id_utilisateur 
+                                            JOIN plat p ON c.id_cuisinier = p.id_cuisinier 
+                                            WHERE cl.id_client = @clientId 
+                                            AND c.date_commande BETWEEN @date3 AND @date4 
+                                            AND p.origine = @nationalite 
+                                            ORDER BY c.date_commande;";
+
+            MySqlCommand cmdCommandesClient = new MySqlCommand(queryCommandesClient, maConnexion);
+            cmdCommandesClient.Parameters.AddWithValue("@clientId", id);
+            cmdCommandesClient.Parameters.AddWithValue("@date3", date3);
+            cmdCommandesClient.Parameters.AddWithValue("@date4", date4);
+            cmdCommandesClient.Parameters.AddWithValue("@nationalite", nationalite);
+
+            MySqlDataReader readerCommandes = cmdCommandesClient.ExecuteReader();
+
+            // Si aucune commande n'est trouvée, on affiche un message
+            if (!readerCommandes.HasRows)
+            {
+                Console.WriteLine("Aucune commande trouvée pour le client {0} avec des plats d'origine '{1}' entre {2} et {3}.",
+                                  id, nationalite, date3.ToString("yyyy-MM-dd HH:mm:ss"), date4.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
+            else
+            {
+                while (readerCommandes.Read())
+                {
+                    try
+                    {
+                        int idCommande = Convert.ToInt32(readerCommandes["id_commande"]);
+                        DateTime dateCommande = Convert.ToDateTime(readerCommandes["date_commande"]);
+                        int idClient = Convert.ToInt32(readerCommandes["id_client"]);
+                        string nomClient = readerCommandes["nom_client"].ToString();
+                        string prenomClient = readerCommandes["prenom_client"].ToString();
+                        string origine = readerCommandes["origine"].ToString();
+
+                        Console.WriteLine("Commande {0} pour le client {1} {2} (ID: {3}) le {4:d}, Plat d'origine: {5}",
+                                          idCommande, nomClient, prenomClient, idClient, dateCommande, origine);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Erreur lors de la lecture d'une colonne : " + ex.Message);
+                    }
                 }
             }
             readerCommandes.Close();
@@ -711,16 +851,219 @@ namespace PSI
             if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
             {
                 maConnexion.Close();
-                Console.WriteLine("Connexion fermée.");
+
             }
             Console.WriteLine();
         }
 
-        public void Interface_admin()
+
+        public (string metro1, string metro2) Affichage_commande()
         {
-            Console.WriteLine("Que voulez-vous faire ? (entrer le numero)");
-            Console.WriteLine("1.Modification de la base de donnée\n2.Affichage des données");
-            int num = Convert.ToInt32(Console.ReadLine());
+            try
+            {
+                string connexionString = "SERVER=localhost;PORT=3306;" +
+                                         "DATABASE=LivInParis;" +
+                                         "UID=root;PASSWORD=kakawete";
+
+                maConnexion = new MySqlConnection(connexionString);
+                maConnexion.Open();
+                
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                // Gérer l'exception selon les besoins
+            }
+
+            Console.WriteLine("Quel est le numéro de commande ? ");
+            int numero = Convert.ToInt32(Console.ReadLine());
+
+            // Récupération du montant de la commande
+            string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
+                                  "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
+
+            MySqlCommand command0 = new MySqlCommand(commande, maConnexion);
+            command0.Parameters.AddWithValue("@numero", numero);
+            object montant = command0.ExecuteScalar();
+            Console.WriteLine($"Montant total : {montant} euros");
+
+            // Récupération de la station de métro du client
+            string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
+                                      "(SELECT id_utilisateur FROM client WHERE id_client = " +
+                                      "(SELECT id_client FROM commande WHERE id_commande = @numero))";
+
+            MySqlCommand command1 = new MySqlCommand(queryMetroClient, maConnexion);
+            command1.Parameters.AddWithValue("@numero", numero);
+            object metroClient = command1.ExecuteScalar();
+            Console.WriteLine($"Métro client : {metroClient}");
+            string metro1 = metroClient.ToString();
+
+            // Récupération de la station de métro du cuisinier
+            string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
+                                         "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
+                                         "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
+
+            MySqlCommand command2 = new MySqlCommand(queryMetroCuisinier, maConnexion);
+            command2.Parameters.AddWithValue("@numero", numero);
+            object metroCuisinier = command2.ExecuteScalar();
+            string metro2 = metroCuisinier.ToString();
+            Console.WriteLine($"Métro cuisinier : {metroCuisinier}");
+
+            if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
+            {
+                maConnexion.Close();
+                
+            }
+            Console.WriteLine();
+
+            return (metro1, metro2);
+        }
+
+
+        public void Autre()
+        {
+            try
+            {
+                string connexionString = "SERVER=localhost;PORT=3306;" +
+                                         "DATABASE=LivInParis;" +
+                                         "UID=root;PASSWORD=kakawete";
+
+                maConnexion = new MySqlConnection(connexionString);
+                maConnexion.Open();
+                Console.WriteLine("Connexion réussie.");
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                return;
+            }
+
+            
+            Console.WriteLine("\nClient ayant dépensé le plus gros montant en une commande :");
+            string ajout =
+                "SELECT utilisateur.prenom, transaction.montant_total " +
+                "FROM transaction " +
+                "JOIN transaction_commande ON transaction_commande.id_transaction = transaction.id_transaction " +
+                "JOIN commande ON transaction_commande.id_commande = commande.id_commande " +
+                "JOIN client ON commande.id_client = client.id_client " +
+                "JOIN utilisateur ON utilisateur.id_utilisateur = client.id_utilisateur " +
+                "WHERE transaction.montant_total = (SELECT MAX(montant_total) FROM transaction);";
+
+            MySqlCommand command = new MySqlCommand(ajout, maConnexion);
+            try
+            {
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string prenom = reader.GetString("prenom");
+                        decimal montant = reader.GetDecimal("montant_total");
+                        Console.WriteLine($"Prenom : {prenom}, Montant total : {montant} €");
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur : " + e.Message);
+            }
+
+           
+            Console.WriteLine("\nListe des plats végétariens disponibles :");
+            string ajout2 = "SELECT nom_plat FROM plat WHERE regime='Végétarien';";
+            MySqlCommand command2 = new MySqlCommand(ajout2, maConnexion);
+            try
+            {
+                using (MySqlDataReader reader = command2.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string nomPlat = reader.GetString("nom_plat");
+                        Console.WriteLine($"- {nomPlat}");
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur : " + e.Message);
+            }
+
+            
+            Console.WriteLine("\nListe des cuisiniers sur Paris :");
+            string ajout3 =
+                "SELECT cuisinier.id_cuisinier, utilisateur.prenom " +
+                "FROM cuisinier " +
+                "JOIN utilisateur ON utilisateur.id_utilisateur = cuisinier.id_utilisateur " +
+                "WHERE utilisateur.ville = 'Paris';";
+            MySqlCommand command3 = new MySqlCommand(ajout3, maConnexion);
+            try
+            {
+                using (MySqlDataReader reader = command3.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int idCuisinier = reader.GetInt32("id_cuisinier");
+                        string prenom = reader.GetString("prenom");
+                        Console.WriteLine($"Cuisinier #{idCuisinier} : {prenom}");
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur : " + e.Message);
+            }
+
+           
+            Console.WriteLine("\nLivraisons allant à Paris 17 :");
+            string ajout4 = "SELECT id_livraison FROM livraison WHERE zone_livraison='Paris 17';";
+            MySqlCommand command4 = new MySqlCommand(ajout4, maConnexion);
+            try
+            {
+                using (MySqlDataReader reader = command4.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int idLivraison = reader.GetInt32("id_livraison");
+                        Console.WriteLine($"- Livraison #{idLivraison}");
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur : " + e.Message);
+            }
+
+           
+            Console.WriteLine("\nCuisiniers proposant des plats pescétariens :");
+            string ajout5 =
+                "SELECT utilisateur.prenom, utilisateur.nom " +
+                "FROM utilisateur " +
+                "JOIN cuisinier ON utilisateur.id_utilisateur = cuisinier.id_utilisateur " +
+                "JOIN plat ON plat.id_cuisinier = cuisinier.id_cuisinier " +
+                "WHERE plat.regime = 'Pescetarien';";
+            MySqlCommand command5 = new MySqlCommand(ajout5, maConnexion);
+            try
+            {
+                using (MySqlDataReader reader = command5.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string prenom = reader.GetString("prenom");
+                        string nom = reader.GetString("nom");
+                        Console.WriteLine($"- {prenom} {nom}");
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur : " + e.Message);
+            }
+
+            maConnexion.Close();
+            Console.WriteLine("\nFin de la méthode.");
+        }
+
+        public void Requete()
+        {
 
             try
             {
@@ -735,416 +1078,37 @@ namespace PSI
             catch (MySqlException e)
             {
                 Console.WriteLine("Erreur de connexion : " + e.Message);
-                // Gérer l'exception selon les besoins
+                return;
             }
-            switch (num)
+
+            Console.WriteLine("Entrez votre requête SQL :");
+            string requete = Console.ReadLine();
+
+            MySqlCommand command = maConnexion.CreateCommand();
+            command.CommandText = requete;
+            try
             {
-                case 1:
-                    Console.WriteLine("Entrer votre commande : ");
-                    string commande = Convert.ToString(Console.ReadLine());
-                    MySqlCommand command1 = maConnexion.CreateCommand();
-                    command1.CommandText = commande;
-                    command1.Dispose();
+                command.ExecuteNonQuery();
 
-                    break;
-                case 2:
-                    Console.WriteLine("1.Clients\n2.Cuisiniers\n3.Commandes");
-                    int choix = Convert.ToInt32(Console.ReadLine());
-                    switch (choix)
-                    {
-                        case 1:
-                            Affichage_client();
-                            break;
-                        case 2:
-                            Affichage_cuisinier();
-                            break;
-                        case 3:
-                            Affichage_commande();
-                            break;
-                    }
-
-                    break;
 
             }
-        }
-       public (string,string) Affichage_commande()
-{
-    try
-    {
-        string connexionString = "SERVER=localhost;PORT=3306;" +
-                                 "DATABASE=LivInParis;" +
-                                 "UID=root;PASSWORD=1234";
-
-        maConnexion = new MySqlConnection(connexionString);
-        maConnexion.Open();
-        Console.WriteLine("Connexion réussie.");
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur de connexion : " + e.Message);
-        // Gérer l'exception selon les besoins
-    }
-
-    Console.WriteLine("Quel est le numéro de commande ? ");
-    int numero = Convert.ToInt32(Console.ReadLine());
-
-    // Récupération du montant de la commande
-    string commande = "SELECT montant_total FROM transaction WHERE id_transaction = " +
-                          "(SELECT id_transaction FROM transaction_commande WHERE id_commande = @numero)";
-
-    MySqlCommand command0 = new MySqlCommand(commande, maConnexion);
-    command0.Parameters.AddWithValue("@numero", numero);
-    object montant = command0.ExecuteScalar();
-    Console.WriteLine($"Montant total : {montant} euros");
-
-    // Récupération de la station de métro du client
-    string queryMetroClient = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
-                              "(SELECT id_utilisateur FROM client WHERE id_client = " +
-                              "(SELECT id_client FROM commande WHERE id_commande = @numero))";
-
-    MySqlCommand command1 = new MySqlCommand(queryMetroClient, maConnexion);
-    command1.Parameters.AddWithValue("@numero", numero);
-    object metroClient = command1.ExecuteScalar();
-    Console.WriteLine($"Métro client : {metroClient}");
-    string metro1 = metroClient.ToString();
-
-    // Récupération de la station de métro du cuisinier
-    string queryMetroCuisinier = "SELECT metro FROM utilisateur WHERE id_utilisateur = " +
-                                 "(SELECT id_utilisateur FROM cuisinier WHERE id_cuisinier = " +
-                                 "(SELECT id_cuisinier FROM commande WHERE id_commande = @numero))";
-
-    MySqlCommand command2 = new MySqlCommand(queryMetroCuisinier, maConnexion);
-    command2.Parameters.AddWithValue("@numero", numero);
-    object metroCuisinier = command2.ExecuteScalar();
-    string metro2 = metroCuisinier.ToString();
-    Console.WriteLine($"Métro cuisinier : {metroCuisinier}");
-
-    if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
-    {
-        maConnexion.Close();
-        Console.WriteLine("Connexion fermée.");
-    }
-    Console.WriteLine();
-
-    return (metro1, metro2);
-}
-
-        public void AjouterUtilisateur()
-{
-    //nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro
-    Console.WriteLine("nom : ");
-    string nom = Console.ReadLine();
-    Console.WriteLine("prenom : ");
-    string prenom = Console.ReadLine();
-    Console.WriteLine("adresse mail : ");
-    string mail = Console.ReadLine();
-    Console.WriteLine("mot de passe : ");
-    string mdp = Console.ReadLine();
-    Console.WriteLine("numero de telephone : ");
-    string tel = Console.ReadLine();
-    Console.WriteLine("numero de rue : ");
-    int num_rue = Convert.ToInt32(Console.ReadLine());
-    Console.WriteLine("nom de rue : ");
-    string nom_rue = Console.ReadLine();
-    Console.WriteLine("code postal : ");
-    int codepostal = Convert.ToInt32(Console.ReadLine());
-    Console.WriteLine("ville : ");
-    string ville = Console.ReadLine();
-    Console.WriteLine("metro le plus proche : ");
-    string metro = Console.ReadLine();
-
-    try
-    {
-        string connexionString = "SERVER=localhost;PORT=3306;" +
-                                 "DATABASE=LivInParis;" +
-                                 "UID=root;PASSWORD=1234";
-
-        maConnexion = new MySqlConnection(connexionString);
-        maConnexion.Open();
-        Console.WriteLine("Connexion réussie.");
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur de connexion : " + e.Message);
-        // Gérer l'exception selon les besoins
-    }
-
-    string ajout = " INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
-        $"\r\nVALUES ('{nom}', '{prenom}', '{mail}', '{mdp}', '{tel}', {num_rue}, '{nom_rue}', {codepostal}, '{ville}', '{metro}')";
-    MySqlCommand command = maConnexion.CreateCommand();
-    command.CommandText = ajout;
-    try
-    {
-        command.ExecuteNonQuery();
-        Console.WriteLine("reussi");
-
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("echec : " + e.ToString());
-        Console.ReadLine();
-        return;
-    }
-    command.Dispose();
-
-}
-
-public void AjouterClient( int id_utilisateur)
-{
-    Console.WriteLine("Type de client : (entreprise ou particulier)");
-    string type = Console.ReadLine();
-    try
-    {
-        string connexionString = "SERVER=localhost;PORT=3306;" +
-                                 "DATABASE=LivInParis;" +
-                                 "UID=root;PASSWORD=1234";
-
-        maConnexion = new MySqlConnection(connexionString);
-        maConnexion.Open();
-        Console.WriteLine("Connexion réussie.");
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur de connexion : " + e.Message);
-        // Gérer l'exception selon les besoins
-    }
-
-    string ajout = "INSERT INTO client (id_utilisateur, type_client)" +$"\r\nVALUES ({id_utilisateur}, '{type}')";
-    MySqlCommand command = maConnexion.CreateCommand();
-    command.CommandText = ajout;
-    try
-    {
-        command.ExecuteNonQuery();
-        Console.WriteLine("reussi");
-
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("echec : " + e.ToString());
-        Console.ReadLine();
-        return;
-    }
-
-    string recupIdClient = "SELECT id_client FROM client WHERE id_utilisateur =@id_utilisateur ";
-
-    MySqlCommand command1 = new MySqlCommand(recupIdClient, maConnexion);
-    command1.Parameters.AddWithValue("@id_utilisateur", id_utilisateur);
-    object idClient = command1.ExecuteScalar();
-    int id_client =Convert.ToInt32(idClient);
-    Console.WriteLine("etes-vous une entreprise ? (y/n) :");
-    string res = Console.ReadLine();
-    if(res == "y")
-    {
-        //nom_entreprise, nom_referent, id_client)
-        Console.WriteLine("nom entreprise : ");
-        string nom_entreprise = Console.ReadLine();
-        Console.WriteLine("nom_referent : ");
-        string nom_referent = Console.ReadLine();
-        ajout = "INSERT INTO entreprise (nom_entreprise, nom_referent, id_client)" +
-       $"\r\nVALUES ('{nom_entreprise}', '{nom_referent}', {id_client})";
-        command = maConnexion.CreateCommand();
-        command.CommandText = ajout;
-        try
-        {
-            command.ExecuteNonQuery();
-            Console.WriteLine("reussi");
-
-        }
-        catch (MySqlException e)
-        {
-            Console.WriteLine("echec : " + e.ToString());
-            Console.ReadLine();
-            return;
-        }
-    }
-    command.Dispose();
-
-}
-
-public void AjouterCuisinier(int id_utilisateur)
-{
-    //INSERT INTO cuisinier (id_utilisateur, nb_etoile, avis_cuisinier)" +
-    // "\r\nVALUES (6, 3, 'Spécialiste en cuisine française'),"
-
-    Console.WriteLine("nombre d'etoile : ");
-    int nb_etoile = Convert.ToInt32(Console.ReadLine());
-
-    try
-    {
-        string connexionString = "SERVER=localhost;PORT=3306;" +
-                                 "DATABASE=LivInParis;" +
-                                 "UID=root;PASSWORD=1234";
-
-        maConnexion = new MySqlConnection(connexionString);
-        maConnexion.Open();
-        Console.WriteLine("Connexion réussie.");
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur de connexion : " + e.Message);
-        // Gérer l'exception selon les besoins
-    }
-
-    string ajout = "INSERT INTO cuisinier (id_utilisateur, nb_etoile)" +$"\r\nVALUES ({id_utilisateur}, {nb_etoile})";
-    MySqlCommand command = maConnexion.CreateCommand();
-    command.CommandText = ajout;
-    try
-    {
-        command.ExecuteNonQuery();
-        Console.WriteLine("reussi");
-
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("echec : " + e.ToString());
-        Console.ReadLine();
-        return;
-    }
-    command.Dispose();
-
-}
-
-    public void Autre()
-{
-    try
-    {
-        string connexionString = "SERVER=localhost;PORT=3306;" +
-                                 "DATABASE=LivInParis;" +
-                                 "UID=root;PASSWORD=1234";
-
-        maConnexion = new MySqlConnection(connexionString);
-        maConnexion.Open();
-        Console.WriteLine("Connexion réussie.");
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur de connexion : " + e.Message);
-        return;
-    }
-
-    // 1. Client ayant dépensé le plus gros montant en une commande
-    Console.WriteLine("\nClient ayant dépensé le plus gros montant en une commande :");
-    string ajout = 
-        "SELECT utilisateur.prenom, transaction.montant_total " +
-        "FROM transaction " +
-        "JOIN transaction_commande ON transaction_commande.id_transaction = transaction.id_transaction " +
-        "JOIN commande ON transaction_commande.id_commande = commande.id_commande " +
-        "JOIN client ON commande.id_client = client.id_client " +
-        "JOIN utilisateur ON utilisateur.id_utilisateur = client.id_utilisateur " +
-        "WHERE transaction.montant_total = (SELECT MAX(montant_total) FROM transaction);";
-
-    MySqlCommand command = new MySqlCommand(ajout, maConnexion);
-    try
-    {
-        using (MySqlDataReader reader = command.ExecuteReader())
-        {
-            while (reader.Read())
+            catch (MySqlException e)
             {
-                string prenom = reader.GetString("prenom");
-                decimal montant = reader.GetDecimal("montant_total");
-                Console.WriteLine($"Prenom : {prenom}, Montant total : {montant} €");
+                Console.WriteLine(" echec de la requete : " + e.ToString());
+                Console.ReadLine();
+                return;
             }
-        }
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur : " + e.Message);
-    }
+            command.Dispose();
 
-    // 2. Liste des plats végétariens
-    Console.WriteLine("\nListe des plats végétariens disponibles :");
-    string ajout2 = "SELECT nom_plat FROM plat WHERE regime='Végétarien';";
-    MySqlCommand command2 = new MySqlCommand(ajout2, maConnexion);
-    try
-    {
-        using (MySqlDataReader reader = command2.ExecuteReader())
-        {
-            while (reader.Read())
+            if (maConnexion != null && maConnexion.State == System.Data.ConnectionState.Open)
             {
-                string nomPlat = reader.GetString("nom_plat");
-                Console.WriteLine($"- {nomPlat}");
+                maConnexion.Close();
+
             }
         }
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur : " + e.Message);
-    }
-
-    // 3. Liste des cuisiniers à Paris
-    Console.WriteLine("\nListe des cuisiniers sur Paris :");
-    string ajout3 = 
-        "SELECT cuisinier.id_cuisinier, utilisateur.prenom " +
-        "FROM cuisinier " +
-        "JOIN utilisateur ON utilisateur.id_utilisateur = cuisinier.id_utilisateur " +
-        "WHERE utilisateur.ville = 'Paris';";
-    MySqlCommand command3 = new MySqlCommand(ajout3, maConnexion);
-    try
-    {
-        using (MySqlDataReader reader = command3.ExecuteReader())
-        {
-            while (reader.Read())
-            {
-                int idCuisinier = reader.GetInt32("id_cuisinier");
-                string prenom = reader.GetString("prenom");
-                Console.WriteLine($"Cuisinier #{idCuisinier} : {prenom}");
-            }
-        }
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur : " + e.Message);
-    }
-
-    // 4. Livraisons à Paris 17
-    Console.WriteLine("\nLivraisons allant à Paris 17 :");
-    string ajout4 = "SELECT id_livraison FROM livraison WHERE zone_livraison='Paris 17';";
-    MySqlCommand command4 = new MySqlCommand(ajout4, maConnexion);
-    try
-    {
-        using (MySqlDataReader reader = command4.ExecuteReader())
-        {
-            while (reader.Read())
-            {
-                int idLivraison = reader.GetInt32("id_livraison");
-                Console.WriteLine($"- Livraison #{idLivraison}");
-            }
-        }
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur : " + e.Message);
-    }
-
-    // 5. Cuisiniers proposant des plats pescétariens
-    Console.WriteLine("\nCuisiniers proposant des plats pescétariens :");
-    string ajout5 = 
-        "SELECT utilisateur.prenom, utilisateur.nom " +
-        "FROM utilisateur " +
-        "JOIN cuisinier ON utilisateur.id_utilisateur = cuisinier.id_utilisateur " +
-        "JOIN plat ON plat.id_cuisinier = cuisinier.id_cuisinier " +
-        "WHERE plat.regime = 'Pescetarien';";
-    MySqlCommand command5 = new MySqlCommand(ajout5, maConnexion);
-    try
-    {
-        using (MySqlDataReader reader = command5.ExecuteReader())
-        {
-            while (reader.Read())
-            {
-                string prenom = reader.GetString("prenom");
-                string nom = reader.GetString("nom");
-                Console.WriteLine($"- {prenom} {nom}");
-            }
-        }
-    }
-    catch (MySqlException e)
-    {
-        Console.WriteLine("Erreur : " + e.Message);
-    }
-
-    maConnexion.Close();
-    Console.WriteLine("\nFin de la méthode.");
-}
 
     }
+
+
+
 }
