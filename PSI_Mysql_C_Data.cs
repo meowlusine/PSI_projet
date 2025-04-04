@@ -1003,5 +1003,148 @@ public void AjouterCuisinier(int id_utilisateur)
     command.Dispose();
 
 }
+
+    public void Autre()
+{
+    try
+    {
+        string connexionString = "SERVER=localhost;PORT=3306;" +
+                                 "DATABASE=LivInParis;" +
+                                 "UID=root;PASSWORD=1234";
+
+        maConnexion = new MySqlConnection(connexionString);
+        maConnexion.Open();
+        Console.WriteLine("Connexion réussie.");
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur de connexion : " + e.Message);
+        return;
+    }
+
+    // 1. Client ayant dépensé le plus gros montant en une commande
+    Console.WriteLine("\nClient ayant dépensé le plus gros montant en une commande :");
+    string ajout = 
+        "SELECT utilisateur.prenom, transaction.montant_total " +
+        "FROM transaction " +
+        "JOIN transaction_commande ON transaction_commande.id_transaction = transaction.id_transaction " +
+        "JOIN commande ON transaction_commande.id_commande = commande.id_commande " +
+        "JOIN client ON commande.id_client = client.id_client " +
+        "JOIN utilisateur ON utilisateur.id_utilisateur = client.id_utilisateur " +
+        "WHERE transaction.montant_total = (SELECT MAX(montant_total) FROM transaction);";
+
+    MySqlCommand command = new MySqlCommand(ajout, maConnexion);
+    try
+    {
+        using (MySqlDataReader reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                string prenom = reader.GetString("prenom");
+                decimal montant = reader.GetDecimal("montant_total");
+                Console.WriteLine($"Prenom : {prenom}, Montant total : {montant} €");
+            }
+        }
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur : " + e.Message);
+    }
+
+    // 2. Liste des plats végétariens
+    Console.WriteLine("\nListe des plats végétariens disponibles :");
+    string ajout2 = "SELECT nom_plat FROM plat WHERE regime='Végétarien';";
+    MySqlCommand command2 = new MySqlCommand(ajout2, maConnexion);
+    try
+    {
+        using (MySqlDataReader reader = command2.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                string nomPlat = reader.GetString("nom_plat");
+                Console.WriteLine($"- {nomPlat}");
+            }
+        }
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur : " + e.Message);
+    }
+
+    // 3. Liste des cuisiniers à Paris
+    Console.WriteLine("\nListe des cuisiniers sur Paris :");
+    string ajout3 = 
+        "SELECT cuisinier.id_cuisinier, utilisateur.prenom " +
+        "FROM cuisinier " +
+        "JOIN utilisateur ON utilisateur.id_utilisateur = cuisinier.id_utilisateur " +
+        "WHERE utilisateur.ville = 'Paris';";
+    MySqlCommand command3 = new MySqlCommand(ajout3, maConnexion);
+    try
+    {
+        using (MySqlDataReader reader = command3.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                int idCuisinier = reader.GetInt32("id_cuisinier");
+                string prenom = reader.GetString("prenom");
+                Console.WriteLine($"Cuisinier #{idCuisinier} : {prenom}");
+            }
+        }
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur : " + e.Message);
+    }
+
+    // 4. Livraisons à Paris 17
+    Console.WriteLine("\nLivraisons allant à Paris 17 :");
+    string ajout4 = "SELECT id_livraison FROM livraison WHERE zone_livraison='Paris 17';";
+    MySqlCommand command4 = new MySqlCommand(ajout4, maConnexion);
+    try
+    {
+        using (MySqlDataReader reader = command4.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                int idLivraison = reader.GetInt32("id_livraison");
+                Console.WriteLine($"- Livraison #{idLivraison}");
+            }
+        }
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur : " + e.Message);
+    }
+
+    // 5. Cuisiniers proposant des plats pescétariens
+    Console.WriteLine("\nCuisiniers proposant des plats pescétariens :");
+    string ajout5 = 
+        "SELECT utilisateur.prenom, utilisateur.nom " +
+        "FROM utilisateur " +
+        "JOIN cuisinier ON utilisateur.id_utilisateur = cuisinier.id_utilisateur " +
+        "JOIN plat ON plat.id_cuisinier = cuisinier.id_cuisinier " +
+        "WHERE plat.regime = 'Pescetarien';";
+    MySqlCommand command5 = new MySqlCommand(ajout5, maConnexion);
+    try
+    {
+        using (MySqlDataReader reader = command5.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                string prenom = reader.GetString("prenom");
+                string nom = reader.GetString("nom");
+                Console.WriteLine($"- {prenom} {nom}");
+            }
+        }
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur : " + e.Message);
+    }
+
+    maConnexion.Close();
+    Console.WriteLine("\nFin de la méthode.");
+}
+
     }
 }
