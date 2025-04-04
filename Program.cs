@@ -43,7 +43,7 @@ namespace PSI
                 {
                     for (int j = 0; j < nb_colonnes; j++)
                     {
-                        matrice[i, j] = liste_temporaire[i][j]; //liste pcq on ne connait pas la longueur de la matrice pour l'instant
+                        matrice[i, j] = liste_temporaire[i][j]; 
                     }
                 }
                 return matrice;
@@ -171,7 +171,6 @@ namespace PSI
 
 
             PSI_Mysql_C_Data Connexion = new PSI_Mysql_C_Data();
-           //Connexion.Peuplement();
             switch (val)
             {
                 case 1:
@@ -208,7 +207,6 @@ namespace PSI
                     catch (MySqlException e)
                     {
                         Console.WriteLine("Erreur de connexion : " + e.Message);
-                        // Gérer l'exception selon les besoins
                     }
                     switch (rep)
                     {
