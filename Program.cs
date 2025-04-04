@@ -210,7 +210,30 @@ namespace PSI
              }
                  Console.WriteLine("\n Ce trajet durera " + temps + " minutes.");
 
+ PSI_Mysql_C_Data maConnexion = new PSI_Mysql_C_Data();
+ //maConnexion.Peuplement();
+(string metroClient,string metroCuisinier)= maConnexion.Affichage_commande();
 
+ int id_metroClient = 0;
+ int id_metroCuisinier = 0;
+ for(int i=0;i< noeuds_temp.Count; i++)
+ {
+     if (noeuds_temp[i].Station.Nom_station == metroClient)
+     {
+         id_metroClient = noeuds_temp[i-1].Id;
+     }
+     else if(noeuds_temp[i].Station.Nom_station == metroCuisinier)
+     {
+         id_metroCuisinier = noeuds_temp[i-1].Id;
+     }
+ }
+ (Noeud<Station>[] chemin, int temps) = algos_chemin.dijkstra(graphe, noeuds_temp[id_metroClient], noeuds_temp[id_metroCuisinier]);
+ Console.WriteLine("le chemin entre " + noeuds_temp[id_metroClient].Station.Nom_station + " et " + noeuds_temp[id_metroCuisinier].Station.Nom_station + " est ");
+ foreach (Noeud<Station> station in chemin)
+ {
+     Console.WriteLine(station.Station.Nom_station);
+ }
+ Console.WriteLine("\n Ce trajet durera " + temps + " minutes.");                
 
              //(Noeud<Station>[] noeuds_djikstra, int temps)=algos_chemin.dijkstra(graphe, noeuds_temp[0], noeuds_temp[80]);
              //List<Noeud<Station>> stations_djikstra= algos_chemin.CreationListeNoeuds(noeuds_djikstra);
