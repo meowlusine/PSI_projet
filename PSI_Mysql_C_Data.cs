@@ -828,5 +828,180 @@ namespace PSI
 
     return (metro1, metro2);
 }
+
+        public void AjouterUtilisateur()
+{
+    //nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro
+    Console.WriteLine("nom : ");
+    string nom = Console.ReadLine();
+    Console.WriteLine("prenom : ");
+    string prenom = Console.ReadLine();
+    Console.WriteLine("adresse mail : ");
+    string mail = Console.ReadLine();
+    Console.WriteLine("mot de passe : ");
+    string mdp = Console.ReadLine();
+    Console.WriteLine("numero de telephone : ");
+    string tel = Console.ReadLine();
+    Console.WriteLine("numero de rue : ");
+    int num_rue = Convert.ToInt32(Console.ReadLine());
+    Console.WriteLine("nom de rue : ");
+    string nom_rue = Console.ReadLine();
+    Console.WriteLine("code postal : ");
+    int codepostal = Convert.ToInt32(Console.ReadLine());
+    Console.WriteLine("ville : ");
+    string ville = Console.ReadLine();
+    Console.WriteLine("metro le plus proche : ");
+    string metro = Console.ReadLine();
+
+    try
+    {
+        string connexionString = "SERVER=localhost;PORT=3306;" +
+                                 "DATABASE=LivInParis;" +
+                                 "UID=root;PASSWORD=1234";
+
+        maConnexion = new MySqlConnection(connexionString);
+        maConnexion.Open();
+        Console.WriteLine("Connexion réussie.");
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur de connexion : " + e.Message);
+        // Gérer l'exception selon les besoins
+    }
+
+    string ajout = " INSERT INTO utilisateur (nom, prenom, email, mot_de_passe, telephone, numero_de_rue, rue, code_postal, ville, metro) " +
+        $"\r\nVALUES ('{nom}', '{prenom}', '{mail}', '{mdp}', '{tel}', {num_rue}, '{nom_rue}', {codepostal}, '{ville}', '{metro}')";
+    MySqlCommand command = maConnexion.CreateCommand();
+    command.CommandText = ajout;
+    try
+    {
+        command.ExecuteNonQuery();
+        Console.WriteLine("reussi");
+
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("echec : " + e.ToString());
+        Console.ReadLine();
+        return;
+    }
+    command.Dispose();
+
+}
+
+public void AjouterClient( int id_utilisateur)
+{
+    Console.WriteLine("Type de client : (entreprise ou particulier)");
+    string type = Console.ReadLine();
+    try
+    {
+        string connexionString = "SERVER=localhost;PORT=3306;" +
+                                 "DATABASE=LivInParis;" +
+                                 "UID=root;PASSWORD=1234";
+
+        maConnexion = new MySqlConnection(connexionString);
+        maConnexion.Open();
+        Console.WriteLine("Connexion réussie.");
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur de connexion : " + e.Message);
+        // Gérer l'exception selon les besoins
+    }
+
+    string ajout = "INSERT INTO client (id_utilisateur, type_client)" +$"\r\nVALUES ({id_utilisateur}, '{type}')";
+    MySqlCommand command = maConnexion.CreateCommand();
+    command.CommandText = ajout;
+    try
+    {
+        command.ExecuteNonQuery();
+        Console.WriteLine("reussi");
+
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("echec : " + e.ToString());
+        Console.ReadLine();
+        return;
+    }
+
+    string recupIdClient = "SELECT id_client FROM client WHERE id_utilisateur =@id_utilisateur ";
+
+    MySqlCommand command1 = new MySqlCommand(recupIdClient, maConnexion);
+    command1.Parameters.AddWithValue("@id_utilisateur", id_utilisateur);
+    object idClient = command1.ExecuteScalar();
+    int id_client =Convert.ToInt32(idClient);
+    Console.WriteLine("etes-vous une entreprise ? (y/n) :");
+    string res = Console.ReadLine();
+    if(res == "y")
+    {
+        //nom_entreprise, nom_referent, id_client)
+        Console.WriteLine("nom entreprise : ");
+        string nom_entreprise = Console.ReadLine();
+        Console.WriteLine("nom_referent : ");
+        string nom_referent = Console.ReadLine();
+        ajout = "INSERT INTO entreprise (nom_entreprise, nom_referent, id_client)" +
+       $"\r\nVALUES ('{nom_entreprise}', '{nom_referent}', {id_client})";
+        command = maConnexion.CreateCommand();
+        command.CommandText = ajout;
+        try
+        {
+            command.ExecuteNonQuery();
+            Console.WriteLine("reussi");
+
+        }
+        catch (MySqlException e)
+        {
+            Console.WriteLine("echec : " + e.ToString());
+            Console.ReadLine();
+            return;
+        }
+    }
+    command.Dispose();
+
+}
+
+public void AjouterCuisinier(int id_utilisateur)
+{
+    //INSERT INTO cuisinier (id_utilisateur, nb_etoile, avis_cuisinier)" +
+    // "\r\nVALUES (6, 3, 'Spécialiste en cuisine française'),"
+
+    Console.WriteLine("nombre d'etoile : ");
+    int nb_etoile = Convert.ToInt32(Console.ReadLine());
+
+    try
+    {
+        string connexionString = "SERVER=localhost;PORT=3306;" +
+                                 "DATABASE=LivInParis;" +
+                                 "UID=root;PASSWORD=1234";
+
+        maConnexion = new MySqlConnection(connexionString);
+        maConnexion.Open();
+        Console.WriteLine("Connexion réussie.");
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("Erreur de connexion : " + e.Message);
+        // Gérer l'exception selon les besoins
+    }
+
+    string ajout = "INSERT INTO cuisinier (id_utilisateur, nb_etoile)" +$"\r\nVALUES ({id_utilisateur}, {nb_etoile})";
+    MySqlCommand command = maConnexion.CreateCommand();
+    command.CommandText = ajout;
+    try
+    {
+        command.ExecuteNonQuery();
+        Console.WriteLine("reussi");
+
+    }
+    catch (MySqlException e)
+    {
+        Console.WriteLine("echec : " + e.ToString());
+        Console.ReadLine();
+        return;
+    }
+    command.Dispose();
+
+}
     }
 }
