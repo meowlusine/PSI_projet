@@ -13,8 +13,10 @@ namespace PSI
 {
     class Program
     {
+       
         static void Main(string[] args)
-        {
+        { 
+            string mdp = "1234";
             string fichier_station = "MetroParis - Noeuds.csv";
             string fichier_arc = "MetroParis - Arcs.csv";
             string[,] matrice_station = Transformation_Matrice(fichier_station);
@@ -174,13 +176,13 @@ namespace PSI
             switch (val)
             {
                 case 1:
-                    string mdp = "";
+                    string mot= "";
                     Console.WriteLine("Entrez le mot de passe admin");
-                     mdp = Console.ReadLine();
-                    while(mdp != "kakawete")
+                     mot = Console.ReadLine();
+                    while(mot != mdp)
                     {
                         Console.WriteLine("Mot de passe incorrect, essayez à nouveau");
-                        mdp = mdp = Console.ReadLine();
+                        mot = Console.ReadLine();
                     }
                     int rep;
                     while (true)

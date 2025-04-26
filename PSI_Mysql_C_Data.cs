@@ -22,7 +22,7 @@ namespace PSI
     {
         private MySqlConnection maConnexion;
 
-
+        private string mdp = "1234";
         public void Peuplement()
         {
 
@@ -30,7 +30,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -360,7 +360,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -452,7 +452,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -599,7 +599,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -855,7 +855,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -914,7 +914,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -1057,7 +1057,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -1124,7 +1124,7 @@ namespace PSI
 
             try
             {
-                string connexionString = "SERVER=localhost;PORT=3306;DATABASE=LivInParis;UID=root;PASSWORD=kakawete";
+                string connexionString = "SERVER=localhost;PORT=3306;DATABASE=LivInParis;UID=root;PASSWORD=" + mdp;
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
                 Console.WriteLine("Connexion réussie.");
@@ -1180,7 +1180,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
@@ -1252,7 +1252,7 @@ namespace PSI
             {
                 string connexionString = "SERVER=localhost;PORT=3306;" +
                                          "DATABASE=LivInParis;" +
-                                         "UID=root;PASSWORD=kakawete";
+                                         "UID=root;PASSWORD=" + mdp;
 
                 maConnexion = new MySqlConnection(connexionString);
                 maConnexion.Open();
