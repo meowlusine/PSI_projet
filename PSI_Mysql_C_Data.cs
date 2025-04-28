@@ -114,7 +114,7 @@ namespace PSI
             }
             catch (MySqlException e)
             {
-                Console.WriteLine(" Peuplement cuisisniers echec : " + e.ToString());
+                Console.WriteLine(" Peuplement cuisiniers echec : " + e.ToString());
                 Console.ReadLine();
                 return;
             }

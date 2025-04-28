@@ -160,6 +160,9 @@ namespace PSI
 
                
             int val;
+            GraphVisualizer visualizer = new GraphVisualizer(graphe);
+            visualizer.GenererImage("graphe.png");
+            visualizer.AfficherImage("graphe.png");
             while (true)
             {
                 Console.WriteLine("Bienvenue sur Liv'In Paris  !\n Voulez vous vous connecter en tant que \n1.admin \nou \n2.utilisateur");
@@ -200,7 +203,7 @@ namespace PSI
                     {
                         string connexionString = "SERVER=localhost;PORT=3306;" +
                                                  "DATABASE=LivInParis;" +
-                                                 "UID=root;PASSWORD=kakawete";
+                                                 "UID=root;PASSWORD="+mdp;
 
                          maConnexion = new MySqlConnection(connexionString);
                         maConnexion.Open();
@@ -269,9 +272,12 @@ namespace PSI
                                     {
                                         GrapheCheminAffiche.AjouterLien(lien);
                                     }
-                                    GraphVisualizer visualizer = new GraphVisualizer(GrapheCheminAffiche);
+                                    visualizer = new GraphVisualizer(GrapheCheminAffiche);
                                     visualizer.GenererImage("graphe.png");
                                     visualizer.AfficherImage("graphe.png");
+
+
+
 
 
                                     break;
@@ -313,7 +319,7 @@ namespace PSI
                             int id_utilisateur =Connexion.AjouterUtilisateur();
                             
 
-                            Console.WriteLine("Souhaitez vous creer un comptec client ? ");
+                            Console.WriteLine("Souhaitez vous creer un compte client ? ");
 
                             int aut;
                             while (true)

@@ -129,13 +129,15 @@ internal class GraphVisualizer
                     }
                 }
             }
+            var couleurs = WelshPowell(graphe);
 
             foreach (var noeud in graphe.noeuds)
             {
                 var pos = positions[noeud];
-                SKColor nodeColor = officialLineColors.TryGetValue(noeud.Station.Ligne, out SKColor color)
-                    ? color
-                    : SKColors.Gray;
+                int couleurIndex = couleurs[noeud];
+                var palette = new SKColor[] { SKColors.Pink, SKColors.LightSeaGreen, SKColors.Purple, SKColors.Orange, SKColors.Lime };
+                SKColor nodeColor = palette[couleurIndex % palette.Length];
+
                 var paintNode = new SKPaint
                 {
                     Color = nodeColor,
@@ -145,6 +147,7 @@ internal class GraphVisualizer
                 canvas.DrawCircle(pos, rayonNoeud, paintNode);
                 canvas.DrawText(noeud.Station.Nom_station, pos.X + rayonNoeud, pos.Y, paintText);
             }
+
 
             using (var image = surface.Snapshot())
             using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
@@ -163,4 +166,55 @@ internal class GraphVisualizer
     {
         Process.Start(new ProcessStartInfo(fichierSortie) { UseShellExecute = true });
     }
+
+    #region Coloration de graphe 
+
+    /// <summary>
+    /// compare les degres de noeuds
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns> int <0 si degreB inferieur a degreA, 0 si degreB est égal à degreA, int>0 si degreB supérieur à degreA.</returns>
+    public int ComparerParDegré(Noeud<Station> a, Noeud<Station> b)
+    {
+        int degreA = graphe.liste_adjacence[a].Count;
+        int degreB = graphe.liste_adjacence[b].Count;
+        return degreB.CompareTo(degreA);
+    }
+
+    Dictionary<Noeud<Station>, int> WelshPowell(Graphe<Station> graphe)
+    {
+        List<Noeud<Station>> noeudsTries = graphe.noeuds.ToList();
+        noeudsTries.Sort(ComparerParDegré);
+        var couleurs = new Dictionary<Noeud<Station>, int>();
+
+        int couleurActuelle = 0;
+        while (couleurs.Count < graphe.noeuds.Count)
+        {
+            foreach (var noeud in noeudsTries)
+            {
+                if (!couleurs.ContainsKey(noeud))
+                {
+                    bool voisinAvecCouleur = false;
+                    foreach (var voisin in graphe.liste_adjacence[noeud])
+                    {
+                        if (couleurs.ContainsKey(voisin) && couleurs[voisin] == couleurActuelle)
+                        {
+                            voisinAvecCouleur = true;
+                            break;
+                        }
+                    }
+                    if (voisinAvecCouleur==false)
+                    {
+                        couleurs[noeud] = couleurActuelle;
+                    }
+                }
+            }
+            couleurActuelle++;
+        }
+        return couleurs;
+    }
+
+    #endregion
+
 }
