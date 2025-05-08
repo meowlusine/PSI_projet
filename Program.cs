@@ -1,28 +1,32 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using static System.Collections.Specialized.BitVector32;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace PSI
 {
     class Program
     {
-       
+        
         static void Main(string[] args)
-        { 
+        {
             string mdp = "1234";
             string fichier_station = "MetroParis - Noeuds.csv";
             string fichier_arc = "MetroParis - Arcs.csv";
             string[,] matrice_station = Transformation_Matrice(fichier_station);
             string[,] matrice_arc = Transformation_Matrice(fichier_arc);
+            
 
-            static string[,] Transformation_Matrice(string fichier)
+        static string[,] Transformation_Matrice(string fichier)
             {
                 List<string[]> liste_temporaire = new List<string[]>();
 
@@ -45,14 +49,14 @@ namespace PSI
                 {
                     for (int j = 0; j < nb_colonnes; j++)
                     {
-                        matrice[i, j] = liste_temporaire[i][j]; 
+                        matrice[i, j] = liste_temporaire[i][j];
                     }
                 }
                 return matrice;
             }
 
             List<Station> stations = new List<Station>();
-            for (int i = 1; i < matrice_station.GetLength(0); i++) 
+            for (int i = 1; i < matrice_station.GetLength(0); i++)
             {
 
                 string nom_station = matrice_station[i, 2];
@@ -73,7 +77,7 @@ namespace PSI
                 noeuds_temp.Add(new Noeud<Station>(i + 1, stations[i]));
 
             }
-           
+
 
             List<string> exceptions = new List<string> { "place des fetes", "pres saint gervais", "danube" };
             List<Lien> liens = new List<Lien>();
@@ -91,21 +95,21 @@ namespace PSI
                 }
                 noeudtransfert[noeuds_temp[indice]] = transfert;
 
-               
+
                 Noeud<Station> prec = new Noeud<Station>(0, null);
                 if (matrice_arc.GetLength(1) > 2 && !string.IsNullOrEmpty(matrice_arc[i, 2]) && (indice - 1) >= 0)
                 {
                     prec = noeuds_temp[indice - 1];
                 }
 
-               
+
                 Noeud<Station> suiv = new Noeud<Station>(0, null);
                 if (matrice_arc.GetLength(1) > 3 && !string.IsNullOrEmpty(matrice_arc[i, 3]) && (indice + 1) < noeuds_temp.Count)
                 {
                     suiv = noeuds_temp[indice + 1];
                 }
 
-                int temp_changement = transfert; 
+                int temp_changement = transfert;
                 int tempsEntre = 0;
                 if (matrice_arc.GetLength(1) > 4 && !string.IsNullOrEmpty(matrice_arc[i, 4]))
                 {
@@ -115,11 +119,11 @@ namespace PSI
                     }
                 }
                 liens.Add(new Lien(noeuds_temp[indice], prec, suiv, tempsEntre, temp_changement));
-               
+
                 if (noeuds_temp[indice].Station.Ligne == "7bis" &&
                     exceptions.Contains(noeuds_temp[indice].Station.Nom_station.ToLower()))
                 {
-                    
+
                     if (!liens.Any(l => l.Station.Id == noeuds_temp[indice].Id && l.Suivant.Id == suiv.Id))
                     {
 
@@ -132,7 +136,7 @@ namespace PSI
                 }
             }
 
-           
+
             var groupedeNoeud = noeuds_temp.GroupBy(n => n.Station.Nom_station);
             foreach (var group in groupedeNoeud)
             {
@@ -144,7 +148,7 @@ namespace PSI
                     {
                         for (int j = i + 1; j < noeudDeMemeNom.Count; j++)
                         {
-                           
+
                             liens.Add(new Lien(noeudDeMemeNom[i], noeudDeMemeNom[j], noeudDeMemeNom[j], 0, transfert));
                             liens.Add(new Lien(noeudDeMemeNom[j], noeudDeMemeNom[i], noeudDeMemeNom[i], 0, transfert));
                         }
@@ -154,15 +158,113 @@ namespace PSI
 
             Graphe<Station> graphe = new Graphe<Station>(noeuds_temp);
             foreach (var lien in liens)
-                {
-                      graphe.AjouterLien(lien);
-                }
+            {
+                graphe.AjouterLien(lien);
+            }
 
-               
+
             int val;
             GraphVisualizer visualizer = new GraphVisualizer(graphe);
             visualizer.GenererImage("graphe.png");
             visualizer.AfficherImage("graphe.png");
+
+
+             #region Graphe Utilisateur
+
+            // 1. Récupérer les données de la base de données et créer des objets Utilisateur et Commande.
+            List<Utilisateur> utilisateurs = new List<Utilisateur>();
+            List<Commande> commandes = new List<Commande>();
+            // Dictionary<int, List<int>> grapheUtilisateurData = new Dictionary<int, List<int>>();  // Pas nécessaire, on va construire le graphe directement.
+            Dictionary<int, Utilisateur> utilisateurParId = new Dictionary<int, Utilisateur>(); // Pour stocker les utilisateurs par ID.
+
+            string connexionString = "SERVER=localhost;PORT=3306;" +
+                                    "DATABASE=LivInParis;" +
+                                    "UID=root;PASSWORD=" + mdp;
+
+            try
+            {
+                using (MySqlConnection maConnexion = new MySqlConnection(connexionString))
+                {
+   maConnexion.Open();
+
+                    // Récupérer les utilisateurs de la table utilisateur.
+                    string requeteUtilisateurs = "SELECT id_utilisateur, nom FROM utilisateur;";
+                    MySqlCommand commandUtilisateurs = new MySqlCommand(requeteUtilisateurs, maConnexion);
+                    using (MySqlDataReader readerUtilisateurs = commandUtilisateurs.ExecuteReader())
+                    {
+                        while (readerUtilisateurs.Read())
+                        {
+                            int id = readerUtilisateurs.GetInt32("id_utilisateur");
+                            string nom = readerUtilisateurs.GetString("nom");
+                            Utilisateur utilisateur = new Utilisateur(id, nom);
+                            utilisateurs.Add(utilisateur);
+                            utilisateurParId.Add(id, utilisateur); // Remplir le dictionnaire utilisateurParId.
+                        }
+                    }
+
+                    // Récupérer les commandes (relations client-cuisinier).
+                    string requeteCommandes = @"
+            SELECT
+                c.id_commande,
+                cl.id_utilisateur AS id_client_utilisateur,
+                cu.id_utilisateur AS id_cuisinier_utilisateur
+            FROM commande c
+            JOIN client cl ON c.id_client = cl.id_client
+            JOIN cuisinier cu ON c.id_cuisinier = cu.id_cuisinier;";
+
+                    MySqlCommand commandCommandes = new MySqlCommand(requeteCommandes, maConnexion);
+                    using (MySqlDataReader readerCommandes = commandCommandes.ExecuteReader())
+                    {
+                        while (readerCommandes.Read())
+                        {
+                            int idCommande = readerCommandes.GetInt32("id_commande");
+                            int idClientUtilisateur = readerCommandes.GetInt32("id_client_utilisateur");
+                            int idCuisinierUtilisateur = readerCommandes.GetInt32("id_cuisinier_utilisateur");
+
+                            // Vérifier que les utilisateurs existent avant de créer la commande.
+                            if (utilisateurParId.ContainsKey(idClientUtilisateur) && utilisateurParId.ContainsKey(idCuisinierUtilisateur))
+                            {
+                                Utilisateur client = utilisateurParId[idClientUtilisateur];
+                                Utilisateur cuisinier = utilisateurParId[idCuisinierUtilisateur];
+                                commandes.Add(new Commande(idCommande, client, cuisinier));
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Warning: Commande {idCommande} skipped because client {idClientUtilisateur} or cuisinier {idCuisinierUtilisateur} not found.");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("Erreur de connexion : " + e.Message);
+                return;
+            }
+
+            // 2. Créer le GrapheUtilisateur à partir des données récupérées.
+            // Créer une instance de GrapheUtilisateur.
+            GrapheUtilisateur grapheUtilisateur = new GrapheUtilisateur(utilisateurs);
+
+            // Ajouter les commandes au graphe.  C'est ici que la logique est cruciale.
+            foreach (var commande in commandes)
+            {
+                grapheUtilisateur.AjouterCommande(commande);
+            }
+
+            // 3. Visualiser le graphe.
+            GrapheUtilisateurVisualizer visualizerUtilisateur = new GrapheUtilisateurVisualizer(grapheUtilisateur);
+            string cheminImage = "graphe.png";
+            visualizerUtilisateur.GenererImage(cheminImage);
+            visualizerUtilisateur.AfficherImage(cheminImage);
+
+            #endregion
+
+
+
+
+
+
             while (true)
             {
                 Console.WriteLine("Bienvenue sur Liv'In Paris  !\n Voulez vous vous connecter en tant que \n1.admin \nou \n2.utilisateur");
@@ -176,6 +278,8 @@ namespace PSI
 
 
             PSI_Mysql_C_Data Connexion = new PSI_Mysql_C_Data();
+            
+
             switch (val)
             {
                 case 1:
@@ -201,7 +305,7 @@ namespace PSI
                     MySqlConnection maConnexion =null;
                     try
                     {
-                        string connexionString = "SERVER=localhost;PORT=3306;" +
+                        connexionString = "SERVER=localhost;PORT=3306;" +
                                                  "DATABASE=LivInParis;" +
                                                  "UID=root;PASSWORD="+mdp;
 
