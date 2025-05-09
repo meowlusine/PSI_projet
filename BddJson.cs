@@ -13,6 +13,10 @@ public class BddJson
 
     string connectionString = "Server=localhost;Database=LivInParis;Uid=root;PASSWORD=" + mdp;
 
+    /// <summary>
+    /// Lire le fichier
+    /// </summary>
+    /// <param name="nomFichier"></param>
     public static void LectureTokenJson(string nomFichier)
     {
         using (StreamReader reader = new StreamReader(nomFichier))
@@ -30,7 +34,10 @@ public class BddJson
         }
     }
 
-
+    /// <summary>
+    /// afficher les informations dans la console sous format JSON
+    /// </summary>
+    /// <param name="nomFichier"></param>
     public static void AfficherPrettyJson(string nomFichier)
     {
         string json = File.ReadAllText(nomFichier);
@@ -40,6 +47,9 @@ public class BddJson
     }
 
 
+    /// <summary>
+    /// transformer la table plat de la bdd en fichier JSON
+    /// </summary>
     public void ExporterPlatsEnJson()
     {
         List<Plat> plats = new List<Plat>();
@@ -136,6 +146,9 @@ public class BddJson
 
     }
 
+    /// <summary>
+    ///transformer la table client de la bdd en fichier JSON
+    /// </summary>
     public void ExporterClientsEnJson()
     {
         List<Client> clients = new List<Client>();
@@ -164,6 +177,9 @@ public class BddJson
         File.WriteAllText("clients_from_db.json", json);
     }
 
+    /// <summary>
+    /// Exporter la table Commandes de la bdd en JSON
+    /// </summary>
     public void ExporterCommandesEnJson()
     {
         var commandes = new List<Commande2>();

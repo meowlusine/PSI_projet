@@ -14,6 +14,10 @@ public class ExportXMLHandler
 
     string connectionString = "server=localhost;database=LivInParis;uid=root;pwd=" + mdp;
 
+    /// <summary>
+    /// Exporter la table utilisateur de la bdd en fichier xml
+    /// </summary>
+    /// <param name="fichierDestination"></param>
     public void ExportUtilisateursToXML(string fichierDestination)
     {
         List<Utilisateur2> utilisateurs = new List<Utilisateur2>();
@@ -61,7 +65,10 @@ public class ExportXMLHandler
 
     }
 
-
+    /// <summary>
+    /// Exporter la table cuisinier de la bdd en fichier xml
+    /// </summary>
+    /// <param name="fichierDestination"></param>
     public void ExportCuisiniersToXML(string fichierDestination)
     {
         List<Cuisinier> cuisiniers = new List<Cuisinier>();
@@ -96,6 +103,7 @@ public class ExportXMLHandler
         }
 
     }
+
 
     public void ExportClientsToXML(string fichierDestination)
     {
