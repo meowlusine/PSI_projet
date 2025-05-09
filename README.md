@@ -1,5 +1,6 @@
 projet PSI A2 TD E 
-1er rendu sur la BD association de karaté
+Application console type Uber Eat, modélisation de base de données, algorithmique
+
 
 Chloe CHAMY 
 Tashaly SOBNACK
