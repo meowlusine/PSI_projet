@@ -212,8 +212,7 @@ public class BddJson
                 {
                     Id_Cuisinier = reader.GetInt32(reader.GetOrdinal("Id_Cuisinier")),
                     Id_Utilisateur = reader.GetInt32(reader.GetOrdinal("Id_Utilisateur")),
-                    Nb_Etoile = reader.GetInt32(reader.GetOrdinal("Nb_Etoile")),
-                    Avis_Cuisinier = reader.GetString(reader.GetOrdinal("Avis_Cuisinier"))
+                 
                 };
 
                 cuisiniers.Add(cuisinier);

@@ -81,8 +81,8 @@ public class ExportXMLHandler
                     {
                         Id_Cuisinier = reader.GetInt32("id_cuisinier"),
                         Id_Utilisateur = reader.GetInt32("id_utilisateur"),
-                        Nb_Etoile = reader.GetInt32("nb_etoile"),
-                        Avis_Cuisinier = reader.GetString("avis_cuisinier")
+                        
+                       
                     };
                     cuisiniers.Add(c);
                 }

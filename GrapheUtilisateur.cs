@@ -28,7 +28,7 @@ namespace PSI
 
             if (envoyeur != null && receveur != null)
             {
-                // Ajoute la relation de l'envoyeur vers le receveur.
+               
                 if (adjacenceList.ContainsKey(envoyeur))
                 {
                     adjacenceList[envoyeur].Add((receveur, commande));
@@ -38,7 +38,7 @@ namespace PSI
                     adjacenceList[envoyeur] = new List<(Utilisateur Voisin, Commande Commande)> { (receveur, commande) };
                 }
 
-                // Ajoute la relation du receveur vers l'envoyeur.
+                
                 if (adjacenceList.ContainsKey(receveur))
                 {
                     adjacenceList[receveur].Add((envoyeur, commande));

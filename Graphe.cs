@@ -353,7 +353,7 @@ namespace PSI
                             if (suivant.Equals(arrivee))
                             {
 
-                                Noeud<T> stationPrecedente = predecesseur[arrivee]; // La station précédente de la station d'arrivée
+                                Noeud<T> stationPrecedente = predecesseur[arrivee]; 
                                 if (stationPrecedente != null)
                                 {
                                     Lien dernierLien = null;
@@ -436,10 +436,10 @@ namespace PSI
                 return null;
             }
 
-            // Créer un nouveau graphe avec les nœuds du chemin
+            
             Graphe<T> grapheChemin = new Graphe<T>(chemin);
 
-            // Ajouter les liens entre les nœuds consécutifs du chemin
+            
             for (int i = 0; i < chemin.Count - 1; i++)
             {
                 Noeud<T> station = chemin[i];
@@ -471,7 +471,7 @@ namespace PSI
             while (actuel != null)
             {
                 chemin.Push(actuel);
-                actuel = predecesseur[actuel]; //actualiser 
+                actuel = predecesseur[actuel]; 
             }
             while (chemin.Count > 1)
             {

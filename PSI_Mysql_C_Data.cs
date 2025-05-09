@@ -887,7 +887,6 @@ namespace PSI
         }
 
 
-
         public void Autre()
         {
             try
@@ -1029,8 +1028,22 @@ namespace PSI
             maConnexion.Close();
             Console.WriteLine("\nFin de la méthode.");
         }
+        
 
+        public static int LireEntier(string message)
+        {
+            int valeur;
+            while (true)
+            {
+                Console.WriteLine(message);
+                string entree = Console.ReadLine();
+                if (int.TryParse(entree, out valeur))
+                    return valeur;
 
+                Console.WriteLine("Entrée invalide. Veuillez entrer un entier.");
+            }
+            
+        }
 
         public int AjouterUtilisateur()
         {
@@ -1059,12 +1072,10 @@ namespace PSI
             string motdepasse = Console.ReadLine();
             Console.WriteLine("numero de telephone : ");
             string tel = Console.ReadLine();
-            Console.WriteLine("numero de rue : ");
-            int num_rue = Convert.ToInt32(Console.ReadLine());
+            int num_rue = LireEntier("numero de rue");
             Console.WriteLine("nom de rue : ");
             string nom_rue = Console.ReadLine();
-            Console.WriteLine("code postal : ");
-            int codepostal = Convert.ToInt32(Console.ReadLine());
+            int codepostal = LireEntier("code postal : ");
             Console.WriteLine("ville : ");
             string ville = Console.ReadLine();
             Console.WriteLine("metro le plus proche : ");
@@ -1328,7 +1339,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifier que l'utilisateur existe
+                    
                     string checkUser = "SELECT COUNT(*) FROM utilisateur WHERE id_utilisateur = @id";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkUser, connexion))
                     {
@@ -1344,7 +1355,7 @@ namespace PSI
                     Console.WriteLine("Type de client (entreprise ou particulier) :");
                     string type_client = Console.ReadLine().ToLower();
 
-                    // Insérer dans client
+                   
                     string insertClient = "INSERT INTO client (id_utilisateur, type_client) VALUES (@id, @type)";
                     using (MySqlCommand insertCmd = new MySqlCommand(insertClient, connexion))
                     {
@@ -1404,7 +1415,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifier que le client existe
+                   
                     string checkClient = "SELECT COUNT(*) FROM client WHERE id_client = @id";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkClient, connexion))
                     {
@@ -1463,7 +1474,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifie l'existence du client
+                    
                     string verif = "SELECT COUNT(*) FROM client WHERE id_client = @id";
                     using (MySqlCommand cmdVerif = new MySqlCommand(verif, connexion))
                     {
@@ -1476,7 +1487,7 @@ namespace PSI
                         }
                     }
 
-                    // Supprimer de entreprise (si applicable)
+                    
                     string deleteEntreprise = "DELETE FROM entreprise WHERE id_client = @id";
                     using (MySqlCommand cmdEnt = new MySqlCommand(deleteEntreprise, connexion))
                     {
@@ -1484,7 +1495,7 @@ namespace PSI
                         cmdEnt.ExecuteNonQuery();
                     }
 
-                    // Supprimer de client
+                    
                     string deleteClient = "DELETE FROM client WHERE id_client = @id";
                     using (MySqlCommand cmdClient = new MySqlCommand(deleteClient, connexion))
                     {
@@ -1638,7 +1649,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifier si l'utilisateur existe
+
                     string checkUser = "SELECT COUNT(*) FROM utilisateur WHERE id_utilisateur = @id";
                     using (MySqlCommand checkCmd = new MySqlCommand(checkUser, connexion))
                     {
@@ -1651,7 +1662,7 @@ namespace PSI
                         }
                     }
 
-                    // Insérer dans la table cuisinier
+                
                     string insert = "INSERT INTO cuisinier (id_utilisateur) VALUES (@id)";
                     using (MySqlCommand insertCmd = new MySqlCommand(insert, connexion))
                     {
@@ -1682,7 +1693,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifie que le cuisinier existe
+                    
                     string check = "SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand cmd = new MySqlCommand(check, connexion))
                     {
@@ -1748,7 +1759,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifie si le cuisinier existe
+                    
                     string check = "SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand checkCmd = new MySqlCommand(check, connexion))
                     {
@@ -1761,7 +1772,7 @@ namespace PSI
                         }
                     }
 
-                    // Supprime le cuisinier
+                   
                     string delete = "DELETE FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand deleteCmd = new MySqlCommand(delete, connexion))
                     {
@@ -1797,7 +1808,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifie que le cuisinier existe
+                   
                     string check = "SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand checkCmd = new MySqlCommand(check, connexion))
                     {
@@ -1810,7 +1821,7 @@ namespace PSI
                         }
                     }
 
-                    // Requête pour récupérer les plats
+                    
                     string query = @"
                 SELECT nom_plat, type_plat, date_fabrication, regime, origine
                 FROM plat
@@ -1880,7 +1891,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifier si le cuisinier existe
+                    
                     string check = "SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand cmd = new MySqlCommand(check, connexion))
                     {
@@ -1893,7 +1904,7 @@ namespace PSI
                         }
                     }
 
-                    // Récupérer les plats préparés dans la période
+                   
                     string query = @"
                 SELECT nom_plat, type_plat, date_fabrication, regime, origine
                 FROM plat
@@ -1953,7 +1964,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifie que le cuisinier existe
+                   
                     string check = "SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand cmd = new MySqlCommand(check, connexion))
                     {
@@ -1966,7 +1977,7 @@ namespace PSI
                         }
                     }
 
-                    // Requête de fréquence
+                   
                     string query = @"
                 SELECT nom_plat, COUNT(*) AS nb_preparations,
                        (COUNT(*) / total.total_count) AS frequence
@@ -2149,7 +2160,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Récupérer l'id_client à partir de l'id_utilisateur
+                    
                     string queryClient = "SELECT id_client FROM client WHERE id_utilisateur = @idUtil";
                     int idClient;
 
@@ -2168,7 +2179,7 @@ namespace PSI
                     Console.WriteLine("Entrez l'ID du plat que vous souhaitez commander :");
                     int idPlat = Convert.ToInt32(Console.ReadLine());
 
-                    // Récupérer id_cuisinier et quantite du plat
+                 
                     string queryCuisinier = "SELECT id_cuisinier, quantite FROM plat WHERE id_plat = @idPlat";
                     int idCuisinier = -1;
                     int quantite = 0;
@@ -2197,7 +2208,7 @@ namespace PSI
                         return;
                     }
 
-                    // Insertion de la commande
+                    
                     string insertCommande = @"INSERT INTO commande (id_cuisinier, id_client, statut, date_commande, id_plat)
                                       VALUES (@idCuisinier, @idClient, 'en attente', NOW(), @idPlat)";
                     using (MySqlCommand cmdInsert = new MySqlCommand(insertCommande, connexion))
@@ -2218,7 +2229,7 @@ namespace PSI
                         }
                     }
 
-                    // Mise à jour de la quantité disponible
+                   
                     string updateQuantite = "UPDATE plat SET quantite = quantite - 1 WHERE id_plat = @idPlat";
                     using (MySqlCommand cmdUpdate = new MySqlCommand(updateQuantite, connexion))
                     {
@@ -2243,7 +2254,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Récupérer l’ID du cuisinier
+                   
                     string queryId = "SELECT id_cuisinier FROM cuisinier WHERE id_utilisateur = @idUtil";
                     int idCuisinier;
 
@@ -2259,7 +2270,7 @@ namespace PSI
                         idCuisinier = Convert.ToInt32(result);
                     }
 
-                    // Requête pour afficher les commandes en attente sur ses plats
+                   
                     string query = @"
                 SELECT co.id_commande, co.date_commande, u.nom, u.prenom, p.nom_plat
                 FROM commande co
@@ -2314,7 +2325,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Vérifier que la commande appartient bien au cuisinier
+                    
                     string requete = @"
                 SELECT COUNT(*) FROM commande c
                 JOIN cuisinier cu ON c.id_cuisinier = cu.id_cuisinier
@@ -2333,7 +2344,7 @@ namespace PSI
                         }
                     }
 
-                    // Mise à jour du statut
+                    
                     string update = "UPDATE commande SET statut = @statut WHERE id_commande = @idCommande";
 
                     using (MySqlCommand cmd = new MySqlCommand(update, connexion))
@@ -2398,7 +2409,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // 🔎 Récupération de l'id_client
+                   
                     string queryClient = "SELECT id_client FROM client WHERE id_utilisateur = @idUtil";
                     int idClient;
 
@@ -2416,7 +2427,7 @@ namespace PSI
                         idClient = Convert.ToInt32(result);
                     }
 
-                    // 📦 Commandes passées
+                   
                     string queryCommandes = @"
                 SELECT c.id_commande, c.date_commande, c.statut,
                        p.nom_plat, u.nom AS nom_cuisinier, u.prenom AS prenom_cuisinier
@@ -2473,7 +2484,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Demander l'ID du cuisinier
+                   
                     Console.WriteLine("Entrez l'ID du cuisinier :");
                     int idCuisinier;
                     while (!int.TryParse(Console.ReadLine(), out idCuisinier))
@@ -2481,7 +2492,7 @@ namespace PSI
                         Console.WriteLine("Entrée invalide. Veuillez entrer un entier.");
                     }
 
-                    // Vérifier que le cuisinier existe
+                  
                     string check = "SELECT COUNT(*) FROM cuisinier WHERE id_cuisinier = @id";
                     using (MySqlCommand cmd = new MySqlCommand(check, connexion))
                     {
@@ -2494,7 +2505,7 @@ namespace PSI
                         }
                     }
 
-                    // Récupérer les clients servis par ce cuisinier
+                   
                     string queryClients = @"
                 SELECT DISTINCT u.id_utilisateur, u.nom, u.prenom, u.email
                 FROM commande c
@@ -2553,7 +2564,7 @@ namespace PSI
                         Console.WriteLine("Entrée invalide. Veuillez entrer un entier.");
                     }
 
-                    // Vérifier si la commande existe
+                   
                     string checkCommande = "SELECT COUNT(*) FROM commande WHERE id_commande = @id";
                     using (MySqlCommand cmdCheck = new MySqlCommand(checkCommande, connexion))
                     {
@@ -2566,7 +2577,7 @@ namespace PSI
                         }
                     }
 
-                    // Supprimer les dépendances éventuelles (transaction_commande, livraison_commande)
+                  
                     string deleteTransCommande = "DELETE FROM transaction_commande WHERE id_commande = @id";
                     string deleteLivCommande = "DELETE FROM livraison_commande WHERE id_commande = @id";
 
@@ -2582,7 +2593,7 @@ namespace PSI
                         cmd2.ExecuteNonQuery();
                     }
 
-                    // Supprimer la commande elle-même
+                   
                     string deleteCommande = "DELETE FROM commande WHERE id_commande = @id";
                     using (MySqlCommand cmdDelete = new MySqlCommand(deleteCommande, connexion))
                     {
@@ -2615,7 +2626,7 @@ namespace PSI
                 {
                     connexion.Open();
 
-                    // Saisie de l'ID du client
+                   
                     Console.WriteLine("Entrez l'ID du client :");
                     int idClient;
                     while (!int.TryParse(Console.ReadLine(), out idClient))
@@ -2623,7 +2634,7 @@ namespace PSI
                         Console.WriteLine("Entrée invalide. Veuillez entrer un entier.");
                     }
 
-                    // Vérifier que le client existe
+                   
                     string checkClient = "SELECT COUNT(*) FROM client WHERE id_client = @id";
                     using (MySqlCommand cmdCheck = new MySqlCommand(checkClient, connexion))
                     {
@@ -2636,7 +2647,7 @@ namespace PSI
                         }
                     }
 
-                    // Saisie de l'ID du plat
+                    
                     Console.WriteLine("Entrez l'ID du plat :");
                     int idPlat;
                     while (!int.TryParse(Console.ReadLine(), out idPlat))
@@ -2644,7 +2655,7 @@ namespace PSI
                         Console.WriteLine("Entrée invalide. Veuillez entrer un entier.");
                     }
 
-                    // Récupération du cuisinier et de la quantité
+                   
                     string queryPlat = "SELECT id_cuisinier, quantite FROM plat WHERE id_plat = @id";
                     int idCuisinier = -1;
                     int quantite = 0;
@@ -2673,7 +2684,7 @@ namespace PSI
                         return;
                     }
 
-                    // Insertion de la commande
+                   
                     string insertCommande = @"INSERT INTO commande (id_cuisinier, id_client, statut, date_commande, id_plat)
                                       VALUES (@idCuisinier, @idClient, 'en attente', NOW(), @idPlat)";
                     using (MySqlCommand cmdInsert = new MySqlCommand(insertCommande, connexion))
@@ -2694,7 +2705,7 @@ namespace PSI
                         }
                     }
 
-                    // Mise à jour de la quantité
+               
                     string updateQuantite = "UPDATE plat SET quantite = quantite - 1 WHERE id_plat = @idPlat";
                     using (MySqlCommand cmdUpdate = new MySqlCommand(updateQuantite, connexion))
                     {
