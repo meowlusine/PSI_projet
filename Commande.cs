@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace PSI;
 
-namespace PSI
+public class Commande
 {
-    public class Commande
-    {
-        public int Id { get; set; }
-        public Utilisateur Client { get; set; }
-        public Utilisateur Cuisinier { get; set; }
-
-        public Commande(int id, Utilisateur client, Utilisateur cuisinier)
-        {
-            Id = id;
-            Client = client;
-            Cuisinier = cuisinier;
-        }
-    }
+    public int Id_Commande { get; set; }
+    public int Id_Cuisinier { get; set; }
+    public int Id_Client { get; set; }
+    public DateTime Date_Commande { get; set; }
+    public int Id_Plat { get; set; }
+    public Commande() { }
 }
