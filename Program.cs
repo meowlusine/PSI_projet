@@ -370,7 +370,7 @@ namespace PSI
                             while (true)
                             {
                                 Console.WriteLine("Quelle cathegorie souhaitez-vous afficher ou modifier ?");
-                                Console.WriteLine("1.Utilisateur\n2.Client\n3.Cuisinier\n4.Commande\n5.Statistique\n.6");
+                                Console.WriteLine("1.Utilisateur\n2.Client\n3.Cuisinier\n4.Commande\n5.Statistique\n6.Autre");
                                 string entre = Console.ReadLine();
                                 if (int.TryParse(entre, out choix) && choix >= 1 && choix <= 6)
                                 {
