@@ -24,6 +24,10 @@ namespace PSI
         private MySqlConnection maConnexion;
 
         private string mdp = "kakawete";
+        /// <summary>
+        /// Ouvre une connexion à la base et insère des données de test
+        /// dans les tables utilisateur, cuisinier, plat, client, entreprise, recette, commande, transaction, livraison, etc.
+        /// </summary>
         public void Peuplement()
         {
 
@@ -595,6 +599,15 @@ namespace PSI
             }
         }
 
+
+        /// <summary>
+        /// Affiche des statistiques globales :
+        /// - Nombre de livraisons par cuisinier
+        /// - Commandes dans une période
+        /// - Moyenne des prix des commandes
+        /// - Moyenne des commandes par client
+        /// - Commandes d’un client par origine de plat et période
+        /// </summary>
         public void Affichage_statistiques()
         {
             try
@@ -1045,6 +1058,10 @@ namespace PSI
             
         }
 
+        /// <summary>
+        /// Ajoute un nouvel utilisateur
+        /// </summary>
+        /// <returns>L’identifiant généré pour l’utilisateur
         public int AjouterUtilisateur()
         {
             try
@@ -1399,6 +1416,9 @@ namespace PSI
             }
         }
 
+        /// <summary>
+        /// Modifie le type d’un client existant 
+        /// </summary>
         public void ModifierClient()
         {
             Console.WriteLine("Entrez l'ID du client que vous souhaitez modifier : ");
@@ -1633,6 +1653,10 @@ namespace PSI
             }
         }
 
+
+        /// <summary>
+        /// Transforme un utilisateur existant en cuisinier
+        /// </summary>
         public void AjouterCuisinierDepuisUtilisateurExistant()
         {
             Console.WriteLine("Entrez l'ID de l'utilisateur que vous souhaitez lier comme cuisinier :");
