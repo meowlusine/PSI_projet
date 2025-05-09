@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
@@ -9,9 +9,9 @@ namespace PSI;
 
 public class BddJson
 {
-    private static string mdp = "1234qwerty";
+    private static string mdp = "kakawete";
 
-    string connectionString = "Server=localhost;Database=LivInParis;Uid=root;PASSWORD="+mdp;
+    string connectionString = "Server=localhost;Database=LivInParis;Uid=root;PASSWORD=" + mdp;
 
     public static void LectureTokenJson(string nomFichier)
     {
@@ -29,8 +29,8 @@ public class BddJson
             }
         }
     }
-    
-    
+
+
     public static void AfficherPrettyJson(string nomFichier)
     {
         string json = File.ReadAllText(nomFichier);
@@ -38,8 +38,8 @@ public class BddJson
         string pretty = JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
         Console.WriteLine(pretty);
     }
-    
-    
+
+
     public void ExporterPlatsEnJson()
     {
         List<Plat> plats = new List<Plat>();
@@ -54,7 +54,7 @@ public class BddJson
             using (MySqlCommand command = new MySqlCommand(query, connection))
             using (MySqlDataReader reader = command.ExecuteReader())
 
-            
+
                 while (reader.Read())
                 {
                     Plat plat = new Plat();
@@ -135,7 +135,7 @@ public class BddJson
         File.WriteAllText("plats_from_db.json", json);
 
     }
-    
+
     public void ExporterClientsEnJson()
     {
         List<Client> clients = new List<Client>();
@@ -163,7 +163,7 @@ public class BddJson
         string json = JsonConvert.SerializeObject(clients, Formatting.Indented);
         File.WriteAllText("clients_from_db.json", json);
     }
-    
+
     public void ExporterCommandesEnJson()
     {
         var commandes = new List<Commande2>();
@@ -193,7 +193,7 @@ public class BddJson
         var json = JsonConvert.SerializeObject(commandes, Formatting.Indented);
         File.WriteAllText("commandes_from_db.json", json);
     }
-    
+
     public void ExporterCuisiniersEnJson()
     {
 
@@ -223,7 +223,7 @@ public class BddJson
         var json = JsonConvert.SerializeObject(cuisiniers, Formatting.Indented);
         File.WriteAllText("cuisiniers_from_db.json", json);
     }
-    
+
     public void ExporterEntreprisesEnJson()
     {
 
@@ -253,7 +253,7 @@ public class BddJson
         var json = JsonConvert.SerializeObject(entreprises, Formatting.Indented);
         File.WriteAllText("entreprises_from_db.json", json);
     }
-    
+
     public void ExporterLivraisonsEnJson()
     {
 
@@ -283,7 +283,7 @@ public class BddJson
         var json = JsonConvert.SerializeObject(livraisons, Formatting.Indented);
         File.WriteAllText("livraisons_from_db.json", json);
     }
-    
+
     public void ExporterLivraisonCommandesEnJson()
     {
 
@@ -311,7 +311,7 @@ public class BddJson
         var json = JsonConvert.SerializeObject(livCmdList, Formatting.Indented);
         File.WriteAllText("livraison_commandes_from_db.json", json);
     }
-    
+
     public void ExporterRecettesEnJson()
     {
 
@@ -333,8 +333,8 @@ public class BddJson
                     Description_Recette = reader.GetString(reader.GetOrdinal("Description_Recette")),
                     Date_Creation = reader.GetDateTime(reader.GetOrdinal("Date_Creation")),
                     Id_Cuisinier = reader.GetInt32(reader.GetOrdinal("Id_Cuisinier")),
-                    Id_Recette_Origine = reader["Id_Recette_Origine"] != DBNull.Value 
-                        ? reader.GetInt32(reader.GetOrdinal("Id_Recette_Origine")) 
+                    Id_Recette_Origine = reader["Id_Recette_Origine"] != DBNull.Value
+                        ? reader.GetInt32(reader.GetOrdinal("Id_Recette_Origine"))
                         : null
                 };
 
@@ -345,7 +345,7 @@ public class BddJson
         var json = JsonConvert.SerializeObject(recettes, Formatting.Indented);
         File.WriteAllText("recettes_from_db.json", json);
     }
-    
+
     public void ExporterTransactionsEnJson()
     {
 
@@ -375,8 +375,8 @@ public class BddJson
         var json = JsonConvert.SerializeObject(transactions, Formatting.Indented);
         File.WriteAllText("transactions_from_db.json", json);
     }
-    
-    
+
+
     public void ExporterTransactionCommandesEnJson()
     {
 
@@ -404,8 +404,8 @@ public class BddJson
         var json = JsonConvert.SerializeObject(transactionCommandes, Formatting.Indented);
         File.WriteAllText("transactioncommandes_from_db.json", json);
     }
-    
-    public  void ExporterUtilisateursEnJson()
+
+    public void ExporterUtilisateursEnJson()
     {
 
         var utilisateurs = new List<Utilisateur2>();
@@ -441,6 +441,6 @@ public class BddJson
         var json = JsonConvert.SerializeObject(utilisateurs, Formatting.Indented);
         File.WriteAllText("utilisateurs_from_db.json", json);
     }
-    
-    
+
+
 }

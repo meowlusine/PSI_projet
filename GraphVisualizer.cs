@@ -21,7 +21,7 @@ internal class GraphVisualizer
         int rayonNoeud = 10;
         int margin = 50;
 
-    
+
         var longitudes = graphe.noeuds.Select(n => n.Station.Longitude);
         var latitudes = graphe.noeuds.Select(n => n.Station.Latitude);
         double minLongitude = longitudes.Min();
@@ -33,28 +33,28 @@ internal class GraphVisualizer
         double scaleX = (largeur - 2 * margin) / (maxLongitude - minLongitude);
         double scaleY = (hauteur - 2 * margin) / (maxLatitude - minLatitude);
 
-        
+
         var officialLineColors = new Dictionary<string, SKColor>
         {
-            { "1", SKColor.Parse("#FFFF00") },    
-            { "2", SKColor.Parse("#00008B") },    
-            { "3", SKColor.Parse("#6B8E23") },    
-            { "3bis", SKColor.Parse("#87CEEB") }, 
-            { "4", SKColor.Parse("#FFC0CB") },    
-            { "5", SKColor.Parse("#FFA500") },    
-            { "6", SKColor.Parse("#AAF0D1") },   
-            { "7", SKColor.Parse("#FFB6C1") },    
-            { "7bis", SKColor.Parse("#90EE90") }, 
-            { "8", SKColor.Parse("#EE82EE") },    
-            { "9", SKColor.Parse("#78866B") },    
-            { "10", SKColor.Parse("#FFDB58") },  
-            { "11", SKColor.Parse("#A52A2A") },   
-            { "12", SKColor.Parse("#008000") },   
-            { "13", SKColor.Parse("#ADD8E6") },  
+            { "1", SKColor.Parse("#FFFF00") },
+            { "2", SKColor.Parse("#00008B") },
+            { "3", SKColor.Parse("#6B8E23") },
+            { "3bis", SKColor.Parse("#87CEEB") },
+            { "4", SKColor.Parse("#FFC0CB") },
+            { "5", SKColor.Parse("#FFA500") },
+            { "6", SKColor.Parse("#AAF0D1") },
+            { "7", SKColor.Parse("#FFB6C1") },
+            { "7bis", SKColor.Parse("#90EE90") },
+            { "8", SKColor.Parse("#EE82EE") },
+            { "9", SKColor.Parse("#78866B") },
+            { "10", SKColor.Parse("#FFDB58") },
+            { "11", SKColor.Parse("#A52A2A") },
+            { "12", SKColor.Parse("#008000") },
+            { "13", SKColor.Parse("#ADD8E6") },
             { "14", SKColor.Parse("#9400D3") }
         };
 
-        
+
         var extraColors = new List<SKColor>
         {
             SKColors.DarkRed, SKColors.DarkBlue, SKColors.DarkGreen,
@@ -63,13 +63,13 @@ internal class GraphVisualizer
         };
         int extraColorIndex = 0;
 
-        
+
         var allLines = graphe.noeuds.Select(n => n.Station.Ligne).Distinct();
         foreach (var line in allLines)
         {
             if (!officialLineColors.ContainsKey(line))
             {
-               
+
                 officialLineColors[line] = extraColors[extraColorIndex % extraColors.Count];
                 extraColorIndex++;
             }
@@ -80,7 +80,7 @@ internal class GraphVisualizer
             var canvas = surface.Canvas;
             canvas.Clear(SKColors.White);
 
-            
+
             var paintText = new SKPaint
             {
                 Color = SKColors.Black,
@@ -95,17 +95,17 @@ internal class GraphVisualizer
                 IsAntialias = true
             };
 
-           
+
             Dictionary<Noeud<Station>, SKPoint> positions = new Dictionary<Noeud<Station>, SKPoint>();
             foreach (var noeud in graphe.noeuds)
             {
-                
+
                 double x = (noeud.Station.Longitude - minLongitude) * scaleX + margin;
                 double y = (maxLatitude - noeud.Station.Latitude) * scaleY + margin;
                 positions[noeud] = new SKPoint((float)x, (float)y);
             }
 
-            
+
             foreach (var noeud in graphe.liste_adjacence.Keys)
             {
                 foreach (var voisin in graphe.liste_adjacence[noeud])
@@ -204,7 +204,7 @@ internal class GraphVisualizer
                             break;
                         }
                     }
-                    if (voisinAvecCouleur==false)
+                    if (voisinAvecCouleur == false)
                     {
                         couleurs[noeud] = couleurActuelle;
                     }

@@ -21,10 +21,10 @@ namespace PSI
 
             foreach (var Noeud in noeuds)
             {
-                liste_adjacence[Noeud] = new List<Noeud<T>>();  
+                liste_adjacence[Noeud] = new List<Noeud<T>>();
             }
 
-            this.matrice_adjacence = new int[noeuds.Count, noeuds.Count];  
+            this.matrice_adjacence = new int[noeuds.Count, noeuds.Count];
 
         }
 
@@ -32,23 +32,23 @@ namespace PSI
         /// Ajoute un lien de type Lien dans la liste d'adjacence et dans la matrice d'adjacence
         /// </summary>
         /// <param name="lien"></param>
-       public void AjouterLien(Lien lien)
-{
-    Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
-    Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
+        public void AjouterLien(Lien lien)
+        {
+            Noeud<T> station = noeuds.Find(n => n.Id == lien.Station.Id);
+            Noeud<T> suivant = noeuds.Find(n => n.Id == lien.Suivant.Id);
 
-    int stationIndex = noeuds.IndexOf(station);
-    int suivantIndex = noeuds.IndexOf(suivant);
+            int stationIndex = noeuds.IndexOf(station);
+            int suivantIndex = noeuds.IndexOf(suivant);
 
-    if (stationIndex >= 0 && stationIndex < noeuds.Count && suivantIndex >= 0 && suivantIndex < noeuds.Count)
-    {
-        this.liste_adjacence[station].Add(suivant);
-        this.matrice_adjacence[stationIndex, suivantIndex] = lien.Temps_entre_2_stations;
-        this.matrice_adjacence[suivantIndex, stationIndex] = lien.Temps_entre_2_stations;
-        this.matrice_adjacence[stationIndex, stationIndex] = 0;
-       
-    }
-}
+            if (stationIndex >= 0 && stationIndex < noeuds.Count && suivantIndex >= 0 && suivantIndex < noeuds.Count)
+            {
+                this.liste_adjacence[station].Add(suivant);
+                this.matrice_adjacence[stationIndex, suivantIndex] = lien.Temps_entre_2_stations;
+                this.matrice_adjacence[suivantIndex, stationIndex] = lien.Temps_entre_2_stations;
+                this.matrice_adjacence[stationIndex, stationIndex] = 0;
+
+            }
+        }
 
         /// <summary>
         /// Permet d'afficher la liste d'adjacence
@@ -173,7 +173,7 @@ namespace PSI
         /// <returns></returns>
         public bool EstConnexe()
         {
-            bool[] visite = this.DFS(this.noeuds[0]); 
+            bool[] visite = this.DFS(this.noeuds[0]);
             return visite.All(v => v);
         }
         #endregion Connexité
@@ -185,12 +185,12 @@ namespace PSI
         /// <param name="liens"></param>
         /// <returns></returns>
         #region FloydWarshall
-        public (int[,], int[,]) FloydWarshall(List<Lien>liens)
+        public (int[,], int[,]) FloydWarshall(List<Lien> liens)
         {
             int n = noeuds.Count;
             int[,] distance = new int[n, n];
-            int[,] pred = new int[n, n]; 
-            
+            int[,] pred = new int[n, n];
+
 
             for (int i = 0; i < n; i++)
             {
@@ -199,44 +199,44 @@ namespace PSI
                     if (i == j)
                         distance[i, j] = 0;
                     else
-                        distance[i, j] = int.MaxValue; 
-                    pred[i, j] = -1; 
+                        distance[i, j] = int.MaxValue;
+                    pred[i, j] = -1;
                 }
             }
 
 
-                foreach (var lien in liens)
-                {
-                    int i = lien.Station.Id - 1; 
-                    int j = lien.Suivant.Id - 1; 
+            foreach (var lien in liens)
+            {
+                int i = lien.Station.Id - 1;
+                int j = lien.Suivant.Id - 1;
 
-                    
-                    if (i >= 0 && i < n && j >= 0 && j < n)
-                    {
-                        distance[i, j] = lien.Temps_entre_2_stations; 
-                        pred[i, j] = i;
-                    }
+
+                if (i >= 0 && i < n && j >= 0 && j < n)
+                {
+                    distance[i, j] = lien.Temps_entre_2_stations;
+                    pred[i, j] = i;
                 }
+            }
 
-              
-                for (int k = 0; k < n; k++) 
+
+            for (int k = 0; k < n; k++)
+            {
+                for (int i = 0; i < n; i++)
                 {
-                    for (int i = 0; i < n; i++)
+                    for (int j = 0; j < n; j++)
                     {
-                        for (int j = 0; j < n; j++)
+                        if (distance[i, k] != int.MaxValue && distance[k, j] != int.MaxValue && distance[i, j] > distance[i, k] + distance[k, j])
                         {
-                            if (distance[i, k] != int.MaxValue && distance[k, j] != int.MaxValue && distance[i, j] > distance[i, k] + distance[k, j])
-                            {
-                                distance[i, j] = distance[i, k] + distance[k, j]; 
-                                pred[i, j] = pred[k, j]; 
-                            }
+                            distance[i, j] = distance[i, k] + distance[k, j];
+                            pred[i, j] = pred[k, j];
                         }
                     }
                 }
+            }
 
-                return (distance, pred);
+            return (distance, pred);
         }
-        
+
         public void ObtenirTempsTrajet(int startId, int endId, int[,] distance, int[,] pred)
         {
             if (distance[startId, endId] == int.MaxValue)
@@ -248,7 +248,7 @@ namespace PSI
             int totalTime = distance[startId, endId];
             Console.WriteLine("Temps total du trajet : " + totalTime + " minutes");
 
-    
+
             Stack<Noeud<T>> chemin = new Stack<Noeud<T>>();
             Noeud<T> actuel = TrouverNoeudParId(endId);
 
@@ -272,22 +272,22 @@ namespace PSI
         public List<Noeud<T>> ReconstruireChemin(int startId, int endId, int[,] pred)
         {
             List<Noeud<T>> chemin = new List<Noeud<T>>();
-            int temporaire = endId-1;
+            int temporaire = endId - 1;
 
-     
+
             if (pred[startId, endId] == -1)
             {
                 Console.WriteLine("Aucun chemin trouvé entre les nœuds.");
                 return chemin;
             }
 
-      
+
             while (temporaire != startId)
             {
                 chemin.Insert(0, noeuds[temporaire]);
                 temporaire = pred[startId, temporaire];
 
-             
+
                 if (temporaire == -1)
                 {
                     Console.WriteLine("Le chemin est interrompu en raison d'un prédécesseur invalide.");
@@ -317,7 +317,7 @@ namespace PSI
             Dictionary<Noeud<T>, int> distance = new Dictionary<Noeud<T>, int>();
             Dictionary<Noeud<T>, Noeud<T>> predecesseur = new Dictionary<Noeud<T>, Noeud<T>>();
 
-            foreach (var noeud in noeuds) 
+            foreach (var noeud in noeuds)
             {
                 distance[noeud] = int.MaxValue;
                 predecesseur[noeud] = null;
@@ -338,12 +338,12 @@ namespace PSI
                     if (station != null && suivant != null && distance[station] != int.MaxValue)
                     {
                         int poids = lien.Temps_entre_2_stations;
-                        if (station.Station.Ligne != suivant.Station.Ligne) 
+                        if (station.Station.Ligne != suivant.Station.Ligne)
                         {
                             poids += lien.Temps_de_changement;
                         }
 
-                        
+
                         if (distance[station] + poids < distance[suivant])
                         {
                             distance[suivant] = distance[station] + poids;
@@ -352,7 +352,7 @@ namespace PSI
 
                             if (suivant.Equals(arrivee))
                             {
-                                
+
                                 Noeud<T> stationPrecedente = predecesseur[arrivee]; // La station précédente de la station d'arrivée
                                 if (stationPrecedente != null)
                                 {
@@ -360,19 +360,19 @@ namespace PSI
 
                                     foreach (var l in liens)
                                     {
-                                        if ((l.Station.Id == stationPrecedente.Id && l.Suivant.Id == arrivee.Id) || (l.Station.Id == arrivee.Id && l.Suivant.Id == stationPrecedente.Id)) 
+                                        if ((l.Station.Id == stationPrecedente.Id && l.Suivant.Id == arrivee.Id) || (l.Station.Id == arrivee.Id && l.Suivant.Id == stationPrecedente.Id))
                                         {
                                             dernierLien = l;
                                         }
                                     }
 
-                                   
+
                                     if (dernierLien != null)
                                     {
                                         distance[suivant] += dernierLien.Temps_entre_2_stations;
-                                    } 
+                                    }
                                 }
-                    
+
                             }
                         }
                     }
@@ -382,12 +382,12 @@ namespace PSI
                     return null;
                 }
             }
-           
+
             List<Noeud<T>> chemin = new List<Noeud<T>>();
             Noeud<T> courant = arrivee;
             while (courant != null)
             {
-                chemin.Insert(0, courant); 
+                chemin.Insert(0, courant);
                 courant = predecesseur[courant];
             }
 
@@ -406,7 +406,7 @@ namespace PSI
             AfficherChemin(predecesseur, depart, arrivee, distance[arrivee]);
 
             stopwatch.Stop();
-            Console.WriteLine("L'algorithme de BellmanFord s'est effectué en: "+stopwatch.ElapsedMilliseconds+"ms");
+            Console.WriteLine("L'algorithme de BellmanFord s'est effectué en: " + stopwatch.ElapsedMilliseconds + "ms");
 
             return chemin;
         }
@@ -427,7 +427,7 @@ namespace PSI
         }
 
 
-       
+
         public static Graphe<T> CreerGrapheDuChemin(List<Noeud<T>> chemin, List<Lien> tousLesLiens)
         {
             if (chemin == null || chemin.Count < 2)
@@ -445,7 +445,7 @@ namespace PSI
                 Noeud<T> station = chemin[i];
                 Noeud<T> suivant = chemin[i + 1];
 
-                Lien lien = tousLesLiens.Find(l => (l.Station.Id == station.Id && l.Suivant.Id == suivant.Id) ||(l.Station.Id == suivant.Id && l.Suivant.Id == station.Id));
+                Lien lien = tousLesLiens.Find(l => (l.Station.Id == station.Id && l.Suivant.Id == suivant.Id) || (l.Station.Id == suivant.Id && l.Suivant.Id == station.Id));
 
                 if (lien != null)
                 {
@@ -456,9 +456,9 @@ namespace PSI
             return grapheChemin;
         }
 
-        
 
-        
+
+
 
         /// <summary>
         /// Fonction pour afficher PCC sur terminal
@@ -475,123 +475,125 @@ namespace PSI
             }
             while (chemin.Count > 1)
             {
-                Console.Write(chemin.Pop().Station.Nom_station+ "(Ligne " +chemin.Peek().Station.Ligne+") -> ");
+                Console.Write(chemin.Pop().Station.Nom_station + "(Ligne " + chemin.Peek().Station.Ligne + ") -> ");
             }
 
-            
+
             Console.Write(chemin.Pop().Station.Nom_station);
             Console.WriteLine();
-            Console.WriteLine("La distance la plus courte de "+ depart.Station.Nom_station+ " jusqu'à "  +destination.Station.Nom_station+ " est " + distance+ " minutes.");
+            Console.WriteLine("La distance la plus courte de " + depart.Station.Nom_station + " jusqu'à " + destination.Station.Nom_station + " est " + distance + " minutes.");
         }
         #endregion BellmanFord
 
         #region Dijkstra 
 
-                   /// <summary>
-       /// Fonction Djikstra, permet de trouver le PCC d'un noeud de depart à un noeud d'arrivé
-       /// </summary>
-       /// <param name="graphe"></param>
-       /// <param name="depart"></param>
-       /// <param name="arrivee"></param>
-       /// <returns></returns>
-        public static (Noeud<Station>[],int) dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
-{
-    System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
-    stopwatch2.Start();
-
-    int temps =0;
-    bool[] visite = new bool[graphe.noeuds.Count()];
-    int[] poids = new int[graphe.noeuds.Count()];
-    Noeud<Station>[] ordre = new Noeud<Station>[graphe.noeuds.Count()];
-    for (int j=0; j<graphe.noeuds.Count(); j++)
-    {
-        poids[j] = int.MaxValue;
-        ordre[j] = null;
-    }
-    poids[depart.Id - 1] = 0;
-    List<Noeud<Station>> file = new List<Noeud<Station>>(graphe.noeuds);
-    while(file.Count > 0)
-    {
-        Noeud<Station> n = null;
-        int mini_poids = int.MaxValue;
-        foreach(Noeud<Station> noeud in file)
+        /// <summary>
+        /// Fonction Djikstra, permet de trouver le PCC d'un noeud de depart à un noeud d'arrivé
+        /// </summary>
+        /// <param name="graphe"></param>
+        /// <param name="depart"></param>
+        /// <param name="arrivee"></param>
+        /// <returns></returns>
+        public static (Noeud<Station>[], int) dijkstra(Graphe<Station> graphe, Noeud<Station> depart, Noeud<Station> arrivee)
         {
-            if (visite[noeud.Id -1] == false && poids[noeud.Id - 1] < mini_poids)
-            {
-                mini_poids = poids[noeud.Id - 1];
-                n = noeud;
-            }
-        }
+            System.Diagnostics.Stopwatch stopwatch2 = new System.Diagnostics.Stopwatch();
+            stopwatch2.Start();
 
-        if (n != null)
-        {
-            file.Remove(n);
-            visite[n.Id - 1] = true;
-            
-
-            if (n == arrivee)
+            int temps = 0;
+            bool[] visite = new bool[graphe.noeuds.Count()];
+            int[] poids = new int[graphe.noeuds.Count()];
+            Noeud<Station>[] ordre = new Noeud<Station>[graphe.noeuds.Count()];
+            for (int j = 0; j < graphe.noeuds.Count(); j++)
             {
-                file.Clear();
+                poids[j] = int.MaxValue;
+                ordre[j] = null;
             }
-            else
+            poids[depart.Id - 1] = 0;
+            List<Noeud<Station>> file = new List<Noeud<Station>>(graphe.noeuds);
+            while (file.Count > 0)
             {
-                foreach(Noeud<Station> voisin in graphe.liste_adjacence[n])
+                Noeud<Station> n = null;
+                int mini_poids = int.MaxValue;
+                foreach (Noeud<Station> noeud in file)
                 {
-                    if (visite[voisin.Id - 1] == false)
+                    if (visite[noeud.Id - 1] == false && poids[noeud.Id - 1] < mini_poids)
                     {
-                        int ponderation = graphe.matrice_adjacence[n.Id - 1, voisin.Id - 1];
-                        int dist = poids[n.Id - 1] + ponderation;
-                        if (dist < poids[voisin.Id - 1])
+                        mini_poids = poids[noeud.Id - 1];
+                        n = noeud;
+                    }
+                }
+
+                if (n != null)
+                {
+                    file.Remove(n);
+                    visite[n.Id - 1] = true;
+
+
+                    if (n == arrivee)
+                    {
+                        file.Clear();
+                    }
+                    else
+                    {
+                        foreach (Noeud<Station> voisin in graphe.liste_adjacence[n])
                         {
-                            poids[voisin.Id -1]= dist;
-                            ordre[voisin.Id - 1] = n;
+                            if (visite[voisin.Id - 1] == false)
+                            {
+                                int ponderation = graphe.matrice_adjacence[n.Id - 1, voisin.Id - 1];
+                                int dist = poids[n.Id - 1] + ponderation;
+                                if (dist < poids[voisin.Id - 1])
+                                {
+                                    poids[voisin.Id - 1] = dist;
+                                    ordre[voisin.Id - 1] = n;
+                                }
+                            }
                         }
                     }
                 }
+                else
+                {
+                    file.Clear();
+                }
+
             }
+            List<Noeud<Station>> chemin = new List<Noeud<Station>>();
+            Noeud<Station> actuel = arrivee;
+            while (actuel != null)
+            {
+                chemin.Add(actuel);
+                Noeud<Station> precedent = ordre[actuel.Id - 1];
+
+                if (precedent != null)
+                {
+                    temps += graphe.matrice_adjacence[precedent.Id - 1, actuel.Id - 1];
+                }
+
+                actuel = precedent;
+            }
+            chemin.Reverse();
+
+            stopwatch2.Stop();
+            Console.WriteLine("Temps d'exécution de Dijkstra (en ticks) : " + stopwatch2.ElapsedTicks);
+            Console.WriteLine("Temps d'exécution de Dijkstra(en ms) : " + stopwatch2.Elapsed.TotalMilliseconds);
+
+
+            return (chemin.ToArray(), temps);
         }
-        else
+
+        /// <summary>
+        /// Permet de transformer un tableau de noeud en List<Noeud<Station>>, pour ensuite, à partir de cette liste, construire le graphe du PCC
+        /// </summary>
+        /// <param name="tab"></param>
+        /// <returns></returns>
+        public static List<Noeud<Station>> CreationListeNoeuds(Noeud<Station>[] tab)
         {
-            file.Clear() ;
-        }
-
-    }
-     List<Noeud<Station>> chemin = new List<Noeud<Station>>();
-     Noeud<Station> actuel = arrivee;
-     while (actuel != null)
-     {
-         chemin.Add(actuel);
-         Noeud<Station> precedent = ordre[actuel.Id - 1];
-
-         if (precedent != null)
-         {
-             temps += graphe.matrice_adjacence[precedent.Id - 1, actuel.Id - 1];
-         }
-
-         actuel = precedent;
-     }
-     chemin.Reverse();
-
-    stopwatch2.Stop();
-    Console.WriteLine("Temps d'exécution de Dijkstra (en ticks) : " + stopwatch2.ElapsedTicks);
-    Console.WriteLine("Temps d'exécution de Dijkstra(en ms) : " + stopwatch2.Elapsed.TotalMilliseconds);
-
-
-    return (chemin.ToArray(),temps); 
-}
-
-       /// <summary>
-       /// Permet de transformer un tableau de noeud en List<Noeud<Station>>, pour ensuite, à partir de cette liste, construire le graphe du PCC
-       /// </summary>
-       /// <param name="tab"></param>
-       /// <returns></returns>
-        public static List<Noeud<Station>> CreationListeNoeuds( Noeud<Station>[] tab)
-        {
-            if(tab == null || tab.Length == 0){
+            if (tab == null || tab.Length == 0)
+            {
                 return null;
             }
-            List<Noeud<Station>> list= new List<Noeud<Station>>();
-            for (int i = 0; i < tab.Length; i++){
+            List<Noeud<Station>> list = new List<Noeud<Station>>();
+            for (int i = 0; i < tab.Length; i++)
+            {
                 list.Add(tab[i]);
             }
             return list;

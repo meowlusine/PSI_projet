@@ -1,6 +1,5 @@
-<h1>projet PSI A2 TD E Live'In Paris</h1>
-application type UberEat 
-
+projet PSI A2 TD E 
+1er rendu sur la BD association de karaté
 
 Chloe CHAMY 
 Tashaly SOBNACK

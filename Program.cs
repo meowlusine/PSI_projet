@@ -1,59 +1,57 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
-using System.Linq;
+using System.Windows.Input;
 using static System.Collections.Specialized.BitVector32;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace PSI
 {
     class Program
     {
-        
+        static string[,] Transformation_Matrice(string fichier)
+        {
+            List<string[]> liste_temporaire = new List<string[]>();
+
+            using (var reader = new StreamReader(fichier))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string ligne = reader.ReadLine();
+                    string[] valeurs = ligne.Split(',');
+                    liste_temporaire.Add(valeurs);
+                }
+            }
+
+            int nb_lignes = liste_temporaire.Count;
+            int nb_colonnes = liste_temporaire[0].Length;
+
+            string[,] matrice = new string[nb_lignes, nb_colonnes];
+
+            for (int i = 0; i < nb_lignes; i++)
+            {
+                for (int j = 0; j < nb_colonnes; j++)
+                {
+                    matrice[i, j] = liste_temporaire[i][j];
+                }
+            }
+            return matrice;
+        }
         static void Main(string[] args)
         {
-            string mdp = "1234qwerty";
+            #region initialisation et graphe
+            string mdp = "kakawete";
             string fichier_station = "MetroParis - Noeuds.csv";
             string fichier_arc = "MetroParis - Arcs.csv";
             string[,] matrice_station = Transformation_Matrice(fichier_station);
             string[,] matrice_arc = Transformation_Matrice(fichier_arc);
-            
 
-        static string[,] Transformation_Matrice(string fichier)
-            {
-                List<string[]> liste_temporaire = new List<string[]>();
 
-                using (var reader = new StreamReader(fichier))
-                {
-                    while (!reader.EndOfStream)
-                    {
-                        string ligne = reader.ReadLine();
-                        string[] valeurs = ligne.Split(',');
-                        liste_temporaire.Add(valeurs);
-                    }
-                }
-
-                int nb_lignes = liste_temporaire.Count;
-                int nb_colonnes = liste_temporaire[0].Length;
-
-                string[,] matrice = new string[nb_lignes, nb_colonnes];
-
-                for (int i = 0; i < nb_lignes; i++)
-                {
-                    for (int j = 0; j < nb_colonnes; j++)
-                    {
-                        matrice[i, j] = liste_temporaire[i][j];
-                    }
-                }
-                return matrice;
-            }
 
             List<Station> stations = new List<Station>();
             for (int i = 1; i < matrice_station.GetLength(0); i++)
@@ -163,20 +161,14 @@ namespace PSI
             }
 
 
-            int val;
+            
             GraphVisualizer visualizer = new GraphVisualizer(graphe);
             visualizer.GenererImage("graphe.png");
             visualizer.AfficherImage("graphe.png");
 
+            #endregion
 
-             #region Graphe Utilisateur
-
-
-
-
-
-
-
+            #region Graphe Utilisateur
 
             // 1. Récupérer les données de la base de données et créer des objets Utilisateur et Commande.
             List<Utilisateur> utilisateurs = new List<Utilisateur>();
@@ -192,7 +184,7 @@ namespace PSI
             {
                 using (MySqlConnection maConnexion = new MySqlConnection(connexionString))
                 {
-   maConnexion.Open();
+                    maConnexion.Open();
 
                     // Récupérer les utilisateurs de la table utilisateur.
                     string requeteUtilisateurs = "SELECT id_utilisateur, nom FROM utilisateur;";
@@ -267,81 +259,79 @@ namespace PSI
 
             #endregion
 
-
             #region XML JSON
 
-            PSI_Mysql_C_Data Connexion2 = new PSI_Mysql_C_Data();
-            Connexion2.Peuplement();
-            
-            
+           
+
+
             ExportXMLHandler handler = new ExportXMLHandler();
             handler.ExportUtilisateursToXML("utilisateurs.xml");
-            
-            
+
+
             ExportXMLHandler handler2 = new ExportXMLHandler();
             handler2.ExportCuisiniersToXML("cuisiniers.xml");
-            
+
             ExportXMLHandler handler3 = new ExportXMLHandler();
             handler3.ExportClientsToXML("clients.xml");
-            
-            
+
+
             ExportXMLHandler handler4 = new ExportXMLHandler();
             handler4.ExportRecettesToXML("recettes.xml");
-            
+
             ExportXMLHandler handler5 = new ExportXMLHandler();
             handler5.ExportCommandesToXML("commandes.xml");
-            
+
             ExportXMLHandler handler6 = new ExportXMLHandler();
             handler6.ExportEntreprisesToXML("entreprises.xml");
-            
+
             ExportXMLHandler handler7 = new ExportXMLHandler();
             handler7.ExportLivraisonsToXML("livraisons.xml");
-            
+
             ExportXMLHandler handler8 = new ExportXMLHandler();
             handler8.ExportLivraisonCommandesToXML("livraison_commandes.xml");
-            
+
             ExportXMLHandler handler9 = new ExportXMLHandler();
             handler9.ExportPlatsToXML("plats.xml");
-            
+
             ExportXMLHandler handler10 = new ExportXMLHandler();
             handler10.ExportTransactionsToXML("transactions.xml");
-            
+
             ExportXMLHandler handler11 = new ExportXMLHandler();
             handler11.ExportTransactionCommandesToXML("transaction_commandes.xml");
-            
+
 
             var bdd1 = new BddJson();
             bdd1.ExporterRecettesEnJson();
-            
+
             var bdd2 = new BddJson();
             bdd2.ExporterClientsEnJson();
 
-            var bdd3= new BddJson();
+            var bdd3 = new BddJson();
             bdd3.ExporterEntreprisesEnJson();
 
-            var bdd4= new BddJson();
+            var bdd4 = new BddJson();
             bdd4.ExporterPlatsEnJson();
 
-            var bdd5= new BddJson();
+            var bdd5 = new BddJson();
             bdd4.ExporterCommandesEnJson();
 
-            var bdd6= new BddJson();
+            var bdd6 = new BddJson();
             bdd6.ExporterCuisiniersEnJson();
 
-            var bdd7= new BddJson();
+            var bdd7 = new BddJson();
             bdd7.ExporterLivraisonsEnJson();
 
-            var bdd8= new BddJson();
+            var bdd8 = new BddJson();
             bdd8.ExporterLivraisonCommandesEnJson();
 
-            var bdd9= new BddJson();
+            var bdd9 = new BddJson();
             bdd9.ExporterTransactionCommandesEnJson();
 
-            var bdd10= new BddJson();
+            var bdd10 = new BddJson();
             bdd10.ExporterTransactionsEnJson();
 
 
-            var bdd11= new BddJson();
+            var bdd11 = new BddJson();
             bdd11.ExporterUtilisateursEnJson();
 
 
@@ -350,239 +340,417 @@ namespace PSI
 
 
 
-            while (true)
+            bool continuer = true;
+            while (continuer)
             {
                 Console.WriteLine("Bienvenue sur Liv'In Paris  !\n Voulez vous vous connecter en tant que \n1.admin \nou \n2.utilisateur");
-                string entre = Console.ReadLine();
-                if (int.TryParse(entre, out val) && val >= 1 && val <= 2)
+                int val;
+                while (!int.TryParse(Console.ReadLine(), out val) || val < 1 || val > 2)
                 {
-                    break;
+                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
                 }
-                Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
-            }
-
-
-            PSI_Mysql_C_Data Connexion = new PSI_Mysql_C_Data();
-            
-
-            switch (val)
-            {
-                case 1:
-                    string mot= "";
-                    Console.WriteLine("Entrez le mot de passe admin");
-                     mot = Console.ReadLine();
-                    while(mot != mdp)
-                    {
-                        Console.WriteLine("Mot de passe incorrect, essayez à nouveau");
+                PSI_Mysql_C_Data Connexion = new PSI_Mysql_C_Data();
+                switch (val)
+                {
+                    case 1:
+                        string mot = "";
+                        Console.WriteLine("Entrez le mot de passe admin");
                         mot = Console.ReadLine();
-                    }
-                    int rep;
-                    while (true)
-                    {
-                        Console.WriteLine("1.Modifier la base de donnée\n2.Affichage");
-                        string entre = Console.ReadLine();
-                        if (int.TryParse(entre, out rep) && rep >= 1 && rep<= 2)
+                        while (mot != mdp)
                         {
-                            break;
+                            Console.WriteLine("Mot de passe incorrect, essayez à nouveau");
+                            mot = Console.ReadLine();
                         }
-                        Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 5$2.");
-                    }
-                    MySqlConnection maConnexion =null;
-                    try
-                    {
-                        connexionString = "SERVER=localhost;PORT=3306;" +
-                                                 "DATABASE=LivInParis;" +
-                                                 "UID=root;PASSWORD="+mdp;
+                        int rep;
 
-                         maConnexion = new MySqlConnection(connexionString);
-                        maConnexion.Open();
-                        Console.WriteLine("Connexion réussie.");
-                    }
-                    catch (MySqlException e)
-                    {
-                        Console.WriteLine("Erreur de connexion : " + e.Message);
-                    }
-                    switch (rep)
-                    {
-                        case 1:
-                            Connexion.Requete();
+                        
 
-                            break;
-                        case 2:
-                            int choix;
-                            while (true)
-                            {
-                                Console.WriteLine("1.Clients\n2.Cuisiniers\n3.Commandes\n4.Statistiques\n5.Autres");
-                                string entre = Console.ReadLine();
-                                if (int.TryParse(entre, out choix) && choix >= 1 && choix <= 5)
-                                {
-                                    break;
-                                }
-                                Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 5.");
-                            }
-                            switch (choix)
-                            {
-                                case 1:
-                                    Connexion.Affichage_client();
-                                    break;
-                                case 2:
-                                    Connexion.Affichage_cuisinier();
-                                    break;
-                                case 3:
-                                    (string metroClient, string metroCuisinier) = Connexion.Affichage_commande();
-                                    int id_metroClient = 0;
-                                    int id_metroCuisinier = 0;
-                                    for (int i = 0; i < noeuds_temp.Count; i++)
-                                    {
-                                        if (noeuds_temp[i].Station.Nom_station == metroClient)
-                                        {
-                                            id_metroClient = noeuds_temp[i - 1].Id;
-                                        }
-                                        else if (noeuds_temp[i].Station.Nom_station == metroCuisinier)
-                                        {
-                                            id_metroCuisinier = noeuds_temp[i - 1].Id;
-                                        }
-                                    }
-                                    (Noeud<Station>[] chemin, int temps) = Graphe<Station>.dijkstra(graphe, noeuds_temp[id_metroClient], noeuds_temp[id_metroCuisinier]);
-                                    Console.WriteLine("le chemin entre " + noeuds_temp[id_metroClient].Station.Nom_station + " et " + noeuds_temp[id_metroCuisinier].Station.Nom_station + " est ");
-                                    foreach (Noeud<Station> station in chemin)
-                                    {
-                                        Console.WriteLine(station.Station.Nom_station);
-                                    }
-                                    Console.WriteLine("\n Ce trajet durera " + temps + " minutes.");
-                                    List<Noeud<Station>> graphechemin = new List<Noeud<Station>>();
-
-                                    for(int i =0; i < chemin.Length; i++)
-                                    {
-                                        graphechemin.Add(chemin[i]);
-                                    }
-                                    Graphe<Station> GrapheCheminAffiche = new Graphe<Station>(graphechemin);
-                                    foreach (var lien in liens)
-                                    {
-                                        GrapheCheminAffiche.AjouterLien(lien);
-                                    }
-                                    visualizer = new GraphVisualizer(GrapheCheminAffiche);
-                                    visualizer.GenererImage("graphe.png");
-                                    visualizer.AfficherImage("graphe.png");
-
-
-
-
-
-                                    break;
-                                case 4:
-                                    Connexion.Affichage_statistiques();
-                                    break;
-
-                                case 5:
-                                    Connexion.Autre();
-                                    break;
-                            }
-
-                            break;
-
-                    }
-
-                    break;
-                case 2:
-
-                    int chiffre;
-                    while (true)
-                    {
-                        Console.WriteLine("Avez vous déjà un compte utilisateur ? \n1.oui\n2.non");
-                        string entre = Console.ReadLine();
-                        if (int.TryParse(entre, out chiffre) && chiffre >= 1 && chiffre <= 2)
+                        int choix;
+                        while (true)
                         {
-                            break;
+                            Console.WriteLine("Quelle cathegorie souhaitez-vous afficher ou modifier ?");
+                            Console.WriteLine("1.Utilisateur\n2.Client\n3.Cuisinier\n4.Commande\n5.Statistique\n.6");
+                            string entre = Console.ReadLine();
+                            if (int.TryParse(entre, out choix) && choix >= 1 && choix <= 6)
+                            {
+                                break;
+                            }
+                            Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 6.");
                         }
-                        Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
-                    }
-                    switch (chiffre)
-                    {
-                        case 1:
-                            Console.WriteLine("En cours de code");
+                        switch (choix)
+                        {
+                            case 1:
 
-                        break;
-                        case 2:
-                            Console.WriteLine("Ajouter un utilisateur ! :");
-                            int id_utilisateur =Connexion.AjouterUtilisateur();
-                            
-
-                            Console.WriteLine("Souhaitez vous creer un compte client ? ");
-
-                            int aut;
-                            while (true)
-                            {
-                                Console.WriteLine("1.oui\n2.non");
-                                string entre = Console.ReadLine();
-                                if (int.TryParse(entre, out aut) && aut >= 1 && aut <= 2)
+                                int rep2;
+                                while (true)
                                 {
-                                    break;
+                                    Console.WriteLine("Que souhaitez-vous faire?");
+                                    Console.WriteLine("1.Creer un utilisateur\n2.Modifier un utilisateur\n3.supprier un utilisateur");
+                                    string entre = Console.ReadLine();
+                                    if (int.TryParse(entre, out rep2) && rep2 >= 1 && rep2 <= 3)
+                                    {
+                                        break;
+                                    }
+                                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 3.");
                                 }
-                                Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
-                            }
-                            switch (aut)
-                            {
-                                case 1:
-                                    Connexion.AjouterClient(id_utilisateur);
-                                    break;
-                                case 2:
-                                    break;
 
-                            }
+                                switch (rep2)
+                                {
+                                    case 1:
+                                        Connexion.AjouterUtilisateur();
 
+                                        break;
+                                    case 2:
+                                        Connexion.ModifierUtilisateur();
+                                        break;
+                                    case 3:
+                                        Connexion.SupprimerUtilisateur();
+
+                                        break;
+
+                                }
+                                break;
                            
-
-                            Console.WriteLine("Souhaitez vous creer un comptec cuisinier ? ");
-
-                            int aut0;
-                            while (true)
-                            {
-                                Console.WriteLine("1.oui\n2.non");
-                                string entre = Console.ReadLine();
-                                if (int.TryParse(entre, out aut0) && aut0 >= 1 && aut0 <= 2)
+                             break;
+                            case 2:
+                                int rep3;
+                                while (true)
                                 {
-                                    break;
+                                    Console.WriteLine("Que souhaitez-vous faire?");
+                                    Console.WriteLine("1.Creer un client\n2.Modifier un client\n3.supprier un client\n4. Afficher les clients par ordre alphabetique" +
+                                        "\n5. Afficher les clients par rue\n6. Afficher les clients par montant des achats cumulés");
+                                    string entre = Console.ReadLine();
+                                    if (int.TryParse(entre, out rep3) && rep3 >= 1 && rep3 <= 6)
+                                    {
+                                        break;
+                                    }
+                                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 6.");
                                 }
-                                Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
-                            }
-                            switch (aut0)
-                            {
-                                case 1:
-                                    Connexion.AjouterCuisinier(id_utilisateur);
-                                    break;
-                                case 2:
-                                    break;
+                                switch (rep3)
+                                {
+                                    case 1:
+                                        Connexion.AjouterClientDepuisUtilisateurExistant();
 
-                            }
+                                        break;
+                                    case 2:
+                                        Connexion.ModifierClient();
+                                        break;
+                                    case 3:
+                                        Connexion.SupprimerClient();
 
+                                        break;
+                                    case 4:
+                                        Connexion.AfficherClientsOrdreAlphabetique();
+                                        break;
+                                    case 5:
+                                        Connexion.AfficherClientsParRueEtNumero();
+                                        break;
+                                    case 6:
+                                        Connexion.AfficherClientsParMontantCumule();
+                                        break;
+
+                                }
+                                break;
+
+                                break;
+                            case 4:
+                                int rep5;
+                                while (true)
+                                {
+                                    Console.WriteLine("Que souhaitez-vous faire?");
+                                    Console.WriteLine("1.Creer une commande\n2.Supprier une commande");
+                                    string entre = Console.ReadLine();
+                                    if (int.TryParse(entre, out rep5) && rep5 >= 1 && rep5 <= 2)
+                                    {
+                                        break;
+                                    }
+                                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
+                                }
+
+                                switch (rep5)
+                                {
+                                    case 1:
+                                        Connexion.CreerCommandeAdmin();
+
+                                        break;
+                                    case 2:
+                                        Connexion.SupprimerCommande();
+                                        break;
+                                   
+
+                                }
+                                break;
                             break;
+                            case 3:
+                            case 5:
 
+                                Connexion.Affichage_statistiques();
+                                break;
+                                
+                                break;
+                                int rep4;
+                                while (true)
+                                {
+                                    Console.WriteLine("Que souhaitez-vous faire?");
+                                    Console.WriteLine("1.Creer un cuisinier\n2.Modifier un cuisinier\n3.supprier un cuisinier\n4.Affihcer les clients servis depuis son inscription" +
+                                        "\n5.Afficher les clients servi sur une tranche de temps \n6.Affihcer les plats réalisés par fréquence");
+                                    string entre = Console.ReadLine();
+                                    if (int.TryParse(entre, out rep4) && rep4 >= 1 && rep4 <= 6)
+                                    {
+                                        break;
+                                    }
+                                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 6.");
+                                }
+                               
+                                switch (rep4)
+                                {
+                                    case 1:
+                                        Connexion.AjouterCuisinierDepuisUtilisateurExistant();
+                                        break;
+                                    case 2:
+                                        Connexion.ModifierCuisinier();
+                                        break;
+                                    case 3:
+                                        Connexion.SupprimerCuisinier();
+                                        break;
 
-                    }
-                    break;
+                                    case 4:
+                                        Connexion.AfficherClientsServisParCuisinier();
+                                        break;
+
+                                    case 5:
+                                        Connexion.AfficherPlatsDuCuisinierParPeriode();
+
+                                        break;
+
+                                    case 6:
+                                        Connexion.AfficherPlatsParFrequencePourCuisinier();
+
+                                break;
+                                }
+                                break;
+                            case 6:
+                                Connexion.Autre();
+                                break;
+                        }
+                        break;
                
+
+                       
+                    case 2:
+
+                        int chiffre;
+                        while (true)
+                        {
+                            Console.WriteLine("Avez vous déjà un compte utilisateur ? \n1.oui\n2.non");
+                            string entre = Console.ReadLine();
+                            if (int.TryParse(entre, out chiffre) && chiffre >= 1 && chiffre <= 2)
+                            {
+                                break;
+                            }
+                            Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
+                        }
+                        switch (chiffre)
+                        {
+                            case 1:
+                                Console.WriteLine("Entrez votre ID utilisateur :");
+                                int idUtilisateur;
+                                while (!int.TryParse(Console.ReadLine(), out idUtilisateur))
+                                {
+                                    Console.WriteLine("ID invalide. Veuillez entrer un entier.");
+                                }
+
+                                Console.WriteLine("Entrez votre mot de passe :");
+                                string motDePasse = Console.ReadLine();
+
+                                if (Connexion.AuthentifierUtilisateur(idUtilisateur, motDePasse)==true)
+                                {
+                                    Console.WriteLine("Connexion réussie !");
+                                    Console.WriteLine("Souhaitez-vous vous connecter en tant que :");
+                                    Console.WriteLine("1. Client");
+                                    Console.WriteLine("2. Cuisinier");
+
+                                    int choixRole;
+                                    while (!int.TryParse(Console.ReadLine(), out choixRole) || (choixRole != 1 && choixRole != 2))
+                                    {
+                                        Console.WriteLine("Choix invalide. Entrez 1 pour client ou 2 pour cuisinier.");
+                                    }
+
+                                    bool estValide = false;
+                                    if (choixRole == 1)
+                                    {
+                                        estValide = Connexion.EstClient(idUtilisateur);
+                                        if (estValide)
+                                        {
+                                            Console.WriteLine("Connexion en tant que client validée.");
+                                            Console.WriteLine("Bienvenue client !");
+                                            Connexion.AfficherPlatsDisponiblesAujourdHui();
+
+                                            Console.WriteLine("Souhaitez-vous passer une commande ? (y/n)");
+                                            string reponse2 = Console.ReadLine().Trim().ToLower();
+                                            if (reponse2 == "y")
+                                            {
+                                                Connexion.PasserCommande(idUtilisateur);
+                                               
+                                            }
+                                            Connexion.AfficherCommandesClient(idUtilisateur);
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Vous n'avez pas de compte client.");
+                                        }
+                                    }
+                                    else if (choixRole == 2)
+                                    {
+                                        estValide = Connexion.EstCuisinier(idUtilisateur);
+                                        if (estValide)
+                                        {
+                                            Console.WriteLine("Connexion en tant que cuisinier validée.");
+                                            Connexion.AfficherCommandesEnAttenteDuCuisinier(idUtilisateur);
+                                            int idCommande = Connexion.ValidationCommandeParCuisinier(idUtilisateur);
+
+                                            var (metroClient, metroCuisinier) = Connexion.Affichage_commande(idCommande);
+
+                                            // Chercher les nœuds dans le graphe
+                                            Noeud<Station> noeudClient = null;
+                                            Noeud<Station> noeudCuisinier = null;
+
+                                            foreach (var noeud in noeuds_temp)
+                                            {
+                                                if (noeudClient == null && noeud.Station.Nom_station.Equals(metroClient, StringComparison.OrdinalIgnoreCase))
+                                                    noeudClient = noeud;
+
+                                                if (noeudCuisinier == null && noeud.Station.Nom_station.Equals(metroCuisinier, StringComparison.OrdinalIgnoreCase))
+                                                    noeudCuisinier = noeud;
+                                            }
+
+                                            if (noeudClient == null || noeudCuisinier == null)
+                                            {
+                                                Console.WriteLine("Erreur : station introuvable.");
+                                            }
+                                            else
+                                            {
+                                                var chemin = graphe.BellmanFord(noeudCuisinier, noeudClient, liens);
+
+                                                if (chemin == null || chemin.Count == 0)
+                                                {
+                                                    Console.WriteLine("Aucun chemin trouvé avec Bellman-Ford.");
+                                                }
+                                                else
+                                                {
+                                                    Console.WriteLine("\nItinéraire Bellman-Ford :");
+                                                    foreach (var n in chemin)
+                                                    {
+                                                        Console.Write(n.Station.Nom_station + " → ");
+                                                    }
+                                                    Console.WriteLine("Client.");
+
+                                                    var grapheChemin = Graphe<Station>.CreerGrapheDuChemin(chemin, liens);
+                                                    if (grapheChemin != null)
+                                                    {
+                                                        GraphVisualizer visualizer2 = new GraphVisualizer(grapheChemin);
+                                                        string nomImage = $"livraison_commande_{idCommande}.png";
+                                                        visualizer2.GenererImage(nomImage);
+                                                        visualizer2.AfficherImage(nomImage);
+                                                    }
+                                                }
+                                            }
+                                            //Connexion.Affichage_commande(idCommande);
+                                            //List<Noeud<Station>> cheminPlusCourt = graphe.BellmanFord(noeuds_temp[0], noeuds_temp[23], liens);
+
+                                            //Graphe<Station> grapheChemin = Graphe<Station>.CreerGrapheDuChemin(cheminPlusCourt, liens);
+
+                                            //GraphVisualizer visualizer_BF = new GraphVisualizer(grapheChemin);
+
+                                            //visualizer_BF.GenererImage("graphe2.png");
+
+                                            //visualizer_BF.AfficherImage("graphe2.png");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Vous n'avez pas de compte cuisinier.");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Échec de connexion. ID ou mot de passe incorrect.");
+                                }
+
+
+
+                                break;
+                            case 2:
+                                Console.WriteLine("Ajouter un utilisateur ! :");
+                                int id_utilisateur = Connexion.AjouterUtilisateur();
+
+
+                                Console.WriteLine("Souhaitez vous creer un compte client ? ");
+
+                                int aut;
+                                while (true)
+                                {
+                                    Console.WriteLine("1.oui\n2.non");
+                                    string entre = Console.ReadLine();
+                                    if (int.TryParse(entre, out aut) && aut >= 1 && aut <= 2)
+                                    {
+                                        break;
+                                    }
+                                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
+                                }
+                                switch (aut)
+                                {
+                                    case 1:
+                                        Connexion.AjouterClient(id_utilisateur);
+                                        break;
+                                    case 2:
+                                        break;
+
+                                }
+
+
+
+                                Console.WriteLine("Souhaitez vous creer un compte cuisinier ? ");
+
+                                int aut0;
+                                while (true)
+                                {
+                                    Console.WriteLine("1.oui\n2.non");
+                                    string entre = Console.ReadLine();
+                                    if (int.TryParse(entre, out aut0) && aut0 >= 1 && aut0 <= 2)
+                                    {
+                                        break;
+                                    }
+                                    Console.WriteLine("Entrée invalide. Veuillez choisir un numéro entre 1 et 2.");
+                                }
+                                switch (aut0)
+                                {
+                                    case 1:
+                                        Connexion.AjouterCuisinier(id_utilisateur);
+                                        break;
+                                    case 2:
+                                        break;
+
+                                }
+
+                                break;
+
+
+                        }
+                        break;
+
+                }
+                Console.WriteLine("\nSouhaitez-vous quitter ? (y/n)");
+                string reponse = Console.ReadLine().Trim().ToLower();
+                continuer = reponse != "y";
             }
-            
-            
 
 
-
-
-
-
-
+          
 
         }
 
-
-
-
     }
-
-
-
 }
-
 
 

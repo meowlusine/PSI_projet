@@ -50,7 +50,7 @@ namespace PSI
                 var paintEdge = new SKPaint { Color = SKColors.Gray, StrokeWidth = 2, IsAntialias = true };
                 var paintText = new SKPaint { Color = SKColors.Black, TextSize = 20, IsAntialias = true };
 
-                
+                // Dessiner les arêtes
                 foreach (var utilisateur in graphe.Utilisateurs)
                 {
                     foreach (var (voisin, commande) in graphe.ObtenirCommandes(utilisateur))
@@ -62,6 +62,7 @@ namespace PSI
                     }
                 }
 
+                // Dessiner les sommets
                 foreach (var utilisateur in graphe.Utilisateurs)
                 {
                     var pos = positions[utilisateur];
@@ -114,4 +115,3 @@ namespace PSI
         }
     }
 }
-
