@@ -173,7 +173,7 @@ namespace PSI;
         
         public void ExportCommandesToXML(string fichierDestination)
         {
-            List<Commande> commandes = new List<Commande>();
+            List<Commande2> commandes = new List<Commande2>();
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
@@ -186,7 +186,7 @@ namespace PSI;
                 {
                     while (reader.Read())
                     {
-                        Commande c = new Commande
+                        Commande2 c = new Commande2
                         {
                             Id_Commande = reader.GetInt32("id_commande"),
                             Id_Cuisinier = reader.GetInt32("id_cuisinier"),
@@ -199,7 +199,7 @@ namespace PSI;
                 }
             }
 
-            XmlSerializer serializer = new XmlSerializer(typeof(List<Commande>));
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Commande2>));
 
             using (TextWriter writer = new StreamWriter(fichierDestination))
             {
