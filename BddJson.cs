@@ -166,7 +166,7 @@ public class BddJson
     
     public void ExporterCommandesEnJson()
     {
-        var commandes = new List<Commande>();
+        var commandes = new List<Commande2>();
 
         using (MySqlConnection connection = new MySqlConnection(connectionString))
         {
@@ -177,7 +177,7 @@ public class BddJson
 
             while (reader.Read())
             {
-                var commande = new Commande
+                var commande = new Commande2
                 {
                     Id_Commande = reader.GetInt32(reader.GetOrdinal("Id_Commande")),
                     Id_Cuisinier = reader.GetInt32(reader.GetOrdinal("Id_Cuisinier")),
