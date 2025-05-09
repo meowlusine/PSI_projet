@@ -19,7 +19,7 @@ namespace PSI
         
         static void Main(string[] args)
         {
-            string mdp = "1234";
+            string mdp = "1234qwerty";
             string fichier_station = "MetroParis - Noeuds.csv";
             string fichier_arc = "MetroParis - Arcs.csv";
             string[,] matrice_station = Transformation_Matrice(fichier_station);
@@ -171,6 +171,13 @@ namespace PSI
 
              #region Graphe Utilisateur
 
+
+
+
+
+
+
+
             // 1. Récupérer les données de la base de données et créer des objets Utilisateur et Commande.
             List<Utilisateur> utilisateurs = new List<Utilisateur>();
             List<Commande> commandes = new List<Commande>();
@@ -261,6 +268,84 @@ namespace PSI
             #endregion
 
 
+            #region XML JSON
+
+            PSI_Mysql_C_Data Connexion2 = new PSI_Mysql_C_Data();
+            Connexion2.Peuplement();
+            
+            
+            ExportXMLHandler handler = new ExportXMLHandler();
+            handler.ExportUtilisateursToXML("utilisateurs.xml");
+            
+            
+            ExportXMLHandler handler2 = new ExportXMLHandler();
+            handler2.ExportCuisiniersToXML("cuisiniers.xml");
+            
+            ExportXMLHandler handler3 = new ExportXMLHandler();
+            handler3.ExportClientsToXML("clients.xml");
+            
+            
+            ExportXMLHandler handler4 = new ExportXMLHandler();
+            handler4.ExportRecettesToXML("recettes.xml");
+            
+            ExportXMLHandler handler5 = new ExportXMLHandler();
+            handler5.ExportCommandesToXML("commandes.xml");
+            
+            ExportXMLHandler handler6 = new ExportXMLHandler();
+            handler6.ExportEntreprisesToXML("entreprises.xml");
+            
+            ExportXMLHandler handler7 = new ExportXMLHandler();
+            handler7.ExportLivraisonsToXML("livraisons.xml");
+            
+            ExportXMLHandler handler8 = new ExportXMLHandler();
+            handler8.ExportLivraisonCommandesToXML("livraison_commandes.xml");
+            
+            ExportXMLHandler handler9 = new ExportXMLHandler();
+            handler9.ExportPlatsToXML("plats.xml");
+            
+            ExportXMLHandler handler10 = new ExportXMLHandler();
+            handler10.ExportTransactionsToXML("transactions.xml");
+            
+            ExportXMLHandler handler11 = new ExportXMLHandler();
+            handler11.ExportTransactionCommandesToXML("transaction_commandes.xml");
+            
+
+            var bdd1 = new BddJson();
+            bdd1.ExporterRecettesEnJson();
+            
+            var bdd2 = new BddJson();
+            bdd2.ExporterClientsEnJson();
+
+            var bdd3= new BddJson();
+            bdd3.ExporterEntreprisesEnJson();
+
+            var bdd4= new BddJson();
+            bdd4.ExporterPlatsEnJson();
+
+            var bdd5= new BddJson();
+            bdd4.ExporterCommandesEnJson();
+
+            var bdd6= new BddJson();
+            bdd6.ExporterCuisiniersEnJson();
+
+            var bdd7= new BddJson();
+            bdd7.ExporterLivraisonsEnJson();
+
+            var bdd8= new BddJson();
+            bdd8.ExporterLivraisonCommandesEnJson();
+
+            var bdd9= new BddJson();
+            bdd9.ExporterTransactionCommandesEnJson();
+
+            var bdd10= new BddJson();
+            bdd10.ExporterTransactionsEnJson();
+
+
+            var bdd11= new BddJson();
+            bdd11.ExporterUtilisateursEnJson();
+
+
+            #endregion XML JSON
 
 
 
@@ -479,6 +564,8 @@ namespace PSI
                
             }
             
+            
+
 
 
 
